@@ -1,0 +1,24 @@
+{
+  "name": "siipol-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "xlsx.full.min.js",
+  "scripts": {
+    "dev": "serve www",
+    "start": "serve www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2"
+  },
+  "devDependencies": {
+    "serve": "^14.2.6"
+  }
+}
