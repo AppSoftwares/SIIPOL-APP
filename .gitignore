@@ -1,8 +1,28 @@
-# Node modules
+# Entornos virtuales (Python)
+.venv/
+venv/
+env/
+ENV/
+
+# Dependencias de Node (JavaScript)
 node_modules/
+dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Archivos de configuración del sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.iml
+*.swp
+
+# Archivos de entorno con claves secretas y contraseñas
+.env
+.env.local
+*.env
 
 # Capacitor / Android build outputs
 android/app/build/
@@ -12,13 +32,6 @@ android/captures/
 android/app/src/main/assets/public/
 android/app/src/main/assets/capacitor.config.json
 
-# IDEs
-.idea/
-*.iml
-.vscode/
-*.swp
-*.DS_Store
-
-# Zip files / PDF exports
+# Archivos pesados / PDFs / Zips exportados
 *.zip
 *.pdf
