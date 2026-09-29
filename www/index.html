@@ -101,29 +101,32 @@ const SAMPLE_OFFICERS=[
  {nombre:"GONZÁLEZ MENDOZA, MARÍA ELENA",ci:"V-20.114.832",fn:"1991-08-24",org:"CICPC",rango:"DETECTIVE JEFE",cred:"CICPC-99102",ofi:"DELEGACIÓN MUNICIPAL MARACAIBO",tel:"0424-6789012",mail:"mgonzalez@cicpc.gob.ve",siipol:"MGONZALEZ_SIIPOL",sangre:"A POSITIVO (A+)",arma:"PISTOLA TANFOGLIO FORCE 99 CAL 9MM N.º T84920",est:"ACTIVO",nota:"Coordinadora de enlace operativo SIIPOL."},
  {nombre:"FERNÁNDEZ SUÁREZ, JOSÉ LUIS",ci:"V-16.789.201",fn:"1985-11-30",org:"FANB",rango:"MAYOR (GNB)",cred:"GNB-33910",ofi:"COMANDO DE ZONA N.º 11 ZULIA",tel:"0412-5432109",mail:"jfernandez@gnb.mil.ve",siipol:"JFERNANDEZ_SIIPOL",sangre:"O NEGATIVO (O-)",arma:"PISTOLA BROWNING GP-35 CAL 9MM N.º B71209",est:"ACTIVO",vac:{d:today(),h:new Date(Date.now()+5*864e5).toISOString().slice(0,10)},nota:"Actualmente de vacaciones de servicio."}
 ];
-const DEF={p:SAMPLE_OFFICERS,snap:{},cfg:{url:'',last:0,pin:'',firma:'Jefatura del Servicio SIIPOL, VEN 9-1-1 Zulia',
+const DEF={p:SAMPLE_OFFICERS,snap:{},cfg:{url:'',last:0,pin:'',pinSkipped:false,firma:'Jefatura del Servicio SIIPOL, VEN 9-1-1 Zulia',
  fechas:[{n:'Aniversario de la Armada',d:'07-24',o:'Armada'},{n:'Aniversario del Ejército (Batalla de Carabobo)',d:'06-24',o:'Ejército'},{n:'Aniversario de la GNB',d:'08-04',o:'GNB'},{n:'Día del Policía',d:'11-25',o:''}]}};
 let S=JSON.parse(localStorage.getItem('sj')||'null')||DEF;
 if(!S.p||S.p.length===0){S.p=SAMPLE_OFFICERS;save();}
-if(S.cfg&&S.cfg.pin===undefined)S.cfg.pin='';
+if(!S.cfg)S.cfg={};
+if(S.cfg.pin===undefined)S.cfg.pin='';
 
 /* ---------- Sistema de Seguridad / Autenticación ---------- */
 let isUnlocked=false;
 
 function checkAuth(){
- if(!S.cfg||!S.cfg.pin){
+ if(S.cfg && S.cfg.pin){
+  $('#lock_screen').style.display='flex';
+  $('#hdr_logout').style.display='none';
+  H($('#lock_msg'),'Ingresa tu PIN o clave de seguridad personal para desbloquear el sistema:');
+  H($('#lock_inputs'),`
+   <input type="password" id="pin_input" placeholder="••••" maxlength="12" onkeyup="if(event.key==='Enter')tryUnlock()">
+   <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e" onclick="tryUnlock()">ENTRAR AL SISTEMA</button>
+  `);
+  $('#lock_error').style.display='none';
+  setTimeout(()=>$('#pin_input')&&$('#pin_input').focus(),300);
+ } else if(S.cfg && S.cfg.pinSkipped){
+  unlockApp();
+ } else {
   showSetupPin();
-  return;
  }
- $('#lock_screen').style.display='flex';
- $('#hdr_logout').style.display='none';
- H($('#lock_msg'),'Ingresa tu PIN o clave de seguridad personal para desbloquear el sistema:');
- H($('#lock_inputs'),`
-  <input type="password" id="pin_input" placeholder="••••" maxlength="12" onkeyup="if(event.key==='Enter')tryUnlock()">
-  <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e" onclick="tryUnlock()">ENTRAR AL SISTEMA</button>
- `);
- $('#lock_error').style.display='none';
- setTimeout(()=>$('#pin_input')&&$('#pin_input').focus(),300);
 }
 
 function showSetupPin(){
@@ -143,6 +146,7 @@ function saveNewPin(){
  if(!p1||p1.length<4){alert('El PIN debe tener al menos 4 caracteres.');return;}
  if(p1!==p2){alert('Los dos PIN introducidos no coinciden.');return;}
  S.cfg.pin=p1;
+ S.cfg.pinSkipped=false;
  save();
  unlockApp();
  alert('🔒 PIN de seguridad configurado con éxito.');
@@ -150,6 +154,7 @@ function saveNewPin(){
 
 function skipPin(){
  S.cfg.pin='';
+ S.cfg.pinSkipped=true;
  save();
  unlockApp();
 }
@@ -168,7 +173,7 @@ function tryUnlock(){
 function unlockApp(){
  isUnlocked=true;
  $('#lock_screen').style.display='none';
- if(S.cfg.pin)$('#hdr_logout').style.display='block';
+ if(S.cfg&&S.cfg.pin)$('#hdr_logout').style.display='block';
  go(cur||'ini');
 }
 
@@ -178,7 +183,7 @@ function doLogout(){
 }
 
 document.addEventListener('visibilitychange',()=>{
- if(document.hidden && S.cfg.pin && isUnlocked){
+ if(document.hidden && S.cfg && S.cfg.pin && isUnlocked){
   isUnlocked=false;
  }
 });
@@ -296,7 +301,7 @@ const dos=p=>{
  const R=(l,v)=>`<div class="fr-box"><b>${l}</b><span>${v||'<i style="color:#94a3b8;font-weight:normal">Sin registrar</i>'}</span></div>`;
  const expNum=`EXP-${p.ci?p.ci.replace(/\D/g,''):'0000'}-${new Date().getFullYear()}`;
  const estTxt=onVac(p)?`DE VACACIONES (HASTA ${fmt(p.vac.h)})`:(p.est?p.est.toUpperCase():'ACTIVO / DISPONIBLE');
- const estCls=onVac(p)?'color:#b91c1c;font-weight:bold;':'color:#15803d;font-weight:bold;';
+ const estCls=onVac(p)?`color:#b91c1c;font-weight:bold;`:`color:#15803d;font-weight:bold;`;
  return `<div class="fd"><div class="pp"><svg class="clip" width="34" height="72" viewBox="0 0 34 72"><path d="M10 44V15a7 7 0 0 1 14 0v42a11 11 0 0 1-22 0V22" fill="none" stroke="#8b929c" stroke-width="3" stroke-linecap="round"/></svg>
 <small class="ld">FOLIO: <b>${expNum}</b> | ACTUALIZADO: ${S.cfg.last?fmt(new Date(S.cfg.last).toISOString().slice(0,10)):'—'}</small>
 <div class="stamp">CONFIDENCIAL</div><div class="seal">★<br>USO OFICIAL<br>SIIPOL<br>VEN 9-1-1<br>★</div>
@@ -387,11 +392,7 @@ function jf(){const q=$('#jq').value.toLowerCase();H($('#jl'),LEY.filter(a=>(a[0
 $('#md').onclick=e=>{if(e.target.id=='md')e.target.classList.remove('on')};
 addEventListener('online',()=>sync());
 
-/* Inicializar pantalla de bloqueo o aplicación */
-if(S.cfg&&S.cfg.pin){
- checkAuth();
-}else{
- unlockApp();
-}
+/* Inicializar siempre pantalla de bloqueo / seguridad */
+checkAuth();
 if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync();
 </script></body></html>
