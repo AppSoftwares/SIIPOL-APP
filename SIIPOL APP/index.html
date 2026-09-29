@@ -46,7 +46,7 @@ pre{white-space:pre-wrap;font:13px/1.5 system-ui;margin:0 0 10px}
 #lock_screen .box{background:rgba(30,12,18,0.92);border:2px solid var(--o);border-radius:18px;padding:32px 24px;max-width:380px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,0.6);backdrop-filter:blur(10px)}
 #lock_screen h2{color:#f3e3be;margin:10px 0 4px;font-size:21px;font-family:Georgia,serif}
 #lock_screen p{color:#d1c2b0;font-size:13px;margin:0 0 18px;line-height:1.4}
-#lock_screen input{text-align:center;font-size:22px;letter-spacing:6px;border:2px solid var(--o);background:#120b0e;color:#fff;padding:12px;border-radius:10px;margin-bottom:14px}
+#lock_screen input{text-align:left;font-size:15px;border:2px solid var(--o);background:#120b0e;color:#fff;padding:11px 12px;border-radius:10px;margin-bottom:12px;width:100%}
 </style></head><body>
 <header><div><b>Jefatura del Servicio SIIPOL</b><small>VEN 9-1-1 · Estado Zulia</small></div><button id="hdr_logout" style="display:none;background:#ffffff33;border:1px solid #ffffff66;color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-weight:bold" onclick="doLogout()">🔒 Cerrar Sesión</button></header>
 <main id="v"></main>
@@ -71,12 +71,15 @@ pre{white-space:pre-wrap;font:13px/1.5 system-ui;margin:0 0 10px}
     </svg>
     <div style="font-size:11px;letter-spacing:1.5px;color:var(--o);font-weight:bold;text-transform:uppercase">SALA SITUACIONAL VEN 9-1-1</div>
     <h2>Acceso Restringido</h2>
-    <p id="lock_msg">Ingresa tu PIN o clave de seguridad personal para desbloquear el sistema:</p>
+    <p id="lock_msg">Ingresa tu usuario y contraseña institucional para acceder al sistema:</p>
     <div id="lock_inputs">
-      <input type="password" id="pin_input" placeholder="••••" maxlength="12" onkeyup="if(event.key==='Enter')tryUnlock()">
-      <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e" onclick="tryUnlock()">ENTRAR AL SISTEMA</button>
+      <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">USUARIO / CORREO</small></div>
+      <input type="text" id="auth_user" placeholder="ej: jess.pirela@gmail.com" value="jess.pirela@gmail.com">
+      <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">CONTRASEÑA</small></div>
+      <input type="password" id="auth_pass" placeholder="••••••••" onkeyup="if(event.key==='Enter')tryLogin()">
+      <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e;margin-top:6px" onclick="tryLogin()">INICIAR SESIÓN</button>
     </div>
-    <div id="lock_error" style="color:#f87171;font-size:12px;margin-top:10px;font-weight:bold;display:none">⚠️ PIN incorrecto. Inténtalo de nuevo.</div>
+    <div id="lock_error" style="color:#f87171;font-size:12px;margin-top:10px;font-weight:bold;display:none">⚠️ Usuario o contraseña incorrectos.</div>
   </div>
 </div>
 
@@ -101,74 +104,46 @@ const SAMPLE_OFFICERS=[
  {nombre:"GONZÁLEZ MENDOZA, MARÍA ELENA",ci:"V-20.114.832",fn:"1991-08-24",org:"CICPC",rango:"DETECTIVE JEFE",cred:"CICPC-99102",ofi:"DELEGACIÓN MUNICIPAL MARACAIBO",tel:"0424-6789012",mail:"mgonzalez@cicpc.gob.ve",siipol:"MGONZALEZ_SIIPOL",sangre:"A POSITIVO (A+)",arma:"PISTOLA TANFOGLIO FORCE 99 CAL 9MM N.º T84920",est:"ACTIVO",nota:"Coordinadora de enlace operativo SIIPOL."},
  {nombre:"FERNÁNDEZ SUÁREZ, JOSÉ LUIS",ci:"V-16.789.201",fn:"1985-11-30",org:"FANB",rango:"MAYOR (GNB)",cred:"GNB-33910",ofi:"COMANDO DE ZONA N.º 11 ZULIA",tel:"0412-5432109",mail:"jfernandez@gnb.mil.ve",siipol:"JFERNANDEZ_SIIPOL",sangre:"O NEGATIVO (O-)",arma:"PISTOLA BROWNING GP-35 CAL 9MM N.º B71209",est:"ACTIVO",vac:{d:today(),h:new Date(Date.now()+5*864e5).toISOString().slice(0,10)},nota:"Actualmente de vacaciones de servicio."}
 ];
-const DEF={p:SAMPLE_OFFICERS,snap:{},cfg:{url:'',last:0,pin:'',firma:'Jefatura del Servicio SIIPOL, VEN 9-1-1 Zulia',
+const DEF={p:SAMPLE_OFFICERS,snap:{},cfg:{url:'',last:0,user:'jess.pirela@gmail.com',pass:'SIIPOL.Pirela.saturno',firma:'Jefatura del Servicio SIIPOL, VEN 9-1-1 Zulia',
  fechas:[{n:'Aniversario de la Armada',d:'07-24',o:'Armada'},{n:'Aniversario del Ejército (Batalla de Carabobo)',d:'06-24',o:'Ejército'},{n:'Aniversario de la GNB',d:'08-04',o:'GNB'},{n:'Día del Policía',d:'11-25',o:''}]}};
 let S=JSON.parse(localStorage.getItem('sj')||'null')||DEF;
 if(!S.p||S.p.length===0){S.p=SAMPLE_OFFICERS;save();}
-if(S.cfg&&S.cfg.pin===undefined)S.cfg.pin='';
+if(!S.cfg)S.cfg={};
+if(!S.cfg.user)S.cfg.user='jess.pirela@gmail.com';
+if(!S.cfg.pass)S.cfg.pass='SIIPOL.Pirela.saturno';
 
 /* ---------- Sistema de Seguridad / Autenticación ---------- */
 let isUnlocked=false;
 
 function checkAuth(){
- if(!S.cfg||!S.cfg.pin){
-  showSetupPin();
-  return;
- }
  $('#lock_screen').style.display='flex';
  $('#hdr_logout').style.display='none';
- H($('#lock_msg'),'Ingresa tu PIN o clave de seguridad personal para desbloquear el sistema:');
- H($('#lock_inputs'),`
-  <input type="password" id="pin_input" placeholder="••••" maxlength="12" onkeyup="if(event.key==='Enter')tryUnlock()">
-  <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e" onclick="tryUnlock()">ENTRAR AL SISTEMA</button>
- `);
  $('#lock_error').style.display='none';
- setTimeout(()=>$('#pin_input')&&$('#pin_input').focus(),300);
+ if(!$('#auth_user'))return;
+ $('#auth_user').value=S.cfg.user||'jess.pirela@gmail.com';
+ $('#auth_pass').value='';
+ setTimeout(()=>$('#auth_pass')&&$('#auth_pass').focus(),300);
 }
 
-function showSetupPin(){
- $('#lock_screen').style.display='flex';
- $('#hdr_logout').style.display='none';
- H($('#lock_msg'),'Crea tu PIN personal de seguridad (4 a 8 dígitos/letras) para proteger la información confidencial:');
- H($('#lock_inputs'),`
-  <input type="password" id="pin_new1" placeholder="Escribe tu nuevo PIN" maxlength="12">
-  <input type="password" id="pin_new2" placeholder="Confirma tu nuevo PIN" maxlength="12" style="margin-top:4px">
-  <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e;margin-top:6px" onclick="saveNewPin()">GUARDAR PIN Y ENTRAR</button>
-  <button class="b s" style="width:100%;padding:8px;font-size:12px;color:#f3e3be;border-color:#f3e3be;margin-top:6px" onclick="skipPin()">Omitir protección por ahora</button>
- `);
-}
+function tryLogin(){
+ const u=($('#auth_user').value||'').trim().toLowerCase();
+ const p=($('#auth_pass').value||'').trim();
+ const targetUser=(S.cfg.user||'jess.pirela@gmail.com').toLowerCase();
+ const targetPass=S.cfg.pass||'SIIPOL.Pirela.saturno';
 
-function saveNewPin(){
- const p1=$('#pin_new1').value.trim(),p2=$('#pin_new2').value.trim();
- if(!p1||p1.length<4){alert('El PIN debe tener al menos 4 caracteres.');return;}
- if(p1!==p2){alert('Los dos PIN introducidos no coinciden.');return;}
- S.cfg.pin=p1;
- save();
- unlockApp();
- alert('🔒 PIN de seguridad configurado con éxito.');
-}
-
-function skipPin(){
- S.cfg.pin='';
- save();
- unlockApp();
-}
-
-function tryUnlock(){
- const input=$('#pin_input').value.trim();
- if(input===S.cfg.pin){
+ if(u===targetUser && p===targetPass){
   unlockApp();
  }else{
   $('#lock_error').style.display='block';
-  $('#pin_input').value='';
-  $('#pin_input').focus();
+  $('#auth_pass').value='';
+  $('#auth_pass').focus();
  }
 }
 
 function unlockApp(){
  isUnlocked=true;
  $('#lock_screen').style.display='none';
- if(S.cfg.pin)$('#hdr_logout').style.display='block';
+ $('#hdr_logout').style.display='block';
  go(cur||'ini');
 }
 
@@ -177,8 +152,18 @@ function doLogout(){
  checkAuth();
 }
 
+function updateCredentials(){
+ const newU=$('#cfg_user').value.trim(), newP=$('#cfg_pass').value.trim();
+ if(!newU||!newP){alert('Debes ingresar usuario y contraseña válidos.');return;}
+ S.cfg.user=newU;
+ S.cfg.pass=newP;
+ save();
+ alert('🔒 Credenciales de acceso actualizadas con éxito.');
+ go('cfg');
+}
+
 document.addEventListener('visibilitychange',()=>{
- if(document.hidden && S.cfg.pin && isUnlocked){
+ if(document.hidden && isUnlocked){
   isUnlocked=false;
  }
 });
@@ -194,7 +179,7 @@ const K=(o,keys)=>{
  return '';
 };
 const D=v=>{if(v instanceof Date)return new Date(v.getTime()+432e5).toISOString().slice(0,10);
- const m=String(v).match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);return m?`${m[3]}-${m[2].padStart(2,0)}-${m[1].padStart(2,0)}`:''};
+ const m=String(v).match(/(\d{1,2})[\/-](\d{4})/);return m?`${m[3]}-${m[2].padStart(2,0)}-${m[1].padStart(2,0)}`:''};
 function ingest(rows){let n=0;rows.forEach(o=>{
  const nombre=K(o,['APELLIDO','NOMBRE','FUNCIONARIO','PERSONA']);if(!nombre)return;
  const fnRaw=o[Object.keys(o).find(x=>['F/N','NACIMIENTO','FECHA NAC','NACIM'].some(k=>x.toUpperCase().includes(k)))]||K(o,['F/N','NACIMIENTO','FECHA NAC']);
@@ -277,10 +262,14 @@ function go(t){cur=t;H($('#nav'),TABS.map(x=>`<button class="${x[0]==t?'on':''}"
  <h2>Notas jurídicas</h2><textarea id="jn" rows="4" placeholder="Tus criterios y precedentes…" onchange="S.cfg.nj=this.value;save()">${S.cfg.nj||''}</textarea>`);jf()}
  if(t=='cfg'){H(v,`<h2>Ajustes</h2>
  <div class="card">
-   <h3>🔒 Seguridad y Control de Acceso</h3>
-   <p style="margin:4px 0 10px;font-size:13px">Estado: <b>${S.cfg.pin?'Protegido con PIN personal':'Sin protección (Acceso libre)'}</b></p>
-   <button class="b" onclick="showSetupPin()">${S.cfg.pin?'Cambiar PIN de Acceso':'Configurar PIN de Seguridad'}</button>
-   ${S.cfg.pin?`<button class="b s" onclick="if(confirm('¿Deseas quitar el PIN de seguridad y permitir acceso libre?')){skipPin();go('cfg')}">Desactivar PIN</button>`:''}
+   <h3>🔒 Credenciales y Control de Acceso (.env)</h3>
+   <div style="margin:8px 0">
+     <small style="color:var(--m)">Usuario / Correo Registrado</small>
+     <input id="cfg_user" value="${S.cfg.user||'jess.pirela@gmail.com'}">
+     <small style="color:var(--m)">Contraseña del Sistema</small>
+     <input type="password" id="cfg_pass" value="${S.cfg.pass||'SIIPOL.Pirela.saturno'}">
+     <button class="b" onclick="updateCredentials()">Guardar Cambios de Credenciales</button>
+   </div>
  </div>
  <div class="card"><h3>Importar Excel / CSV</h3><input type="file" accept=".xlsx,.xls,.csv" onchange="loadFile(this.files[0])"></div>
  <div class="card"><h3>Datos de Prueba</h3><button class="b" onclick="S.p=JSON.parse(JSON.stringify(SAMPLE_OFFICERS));save();alert('Funcionarios de ejemplo cargados');go('per')">Cargar Funcionarios de Ejemplo</button>
@@ -387,11 +376,7 @@ function jf(){const q=$('#jq').value.toLowerCase();H($('#jl'),LEY.filter(a=>(a[0
 $('#md').onclick=e=>{if(e.target.id=='md')e.target.classList.remove('on')};
 addEventListener('online',()=>sync());
 
-/* Inicializar pantalla de bloqueo o aplicación */
-if(S.cfg&&S.cfg.pin){
- checkAuth();
-}else{
- unlockApp();
-}
+/* Inicializar siempre pantalla de bloqueo / seguridad */
+checkAuth();
 if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync();
 </script></body></html>
