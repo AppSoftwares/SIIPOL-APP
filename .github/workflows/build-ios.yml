@@ -7,6 +7,9 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-ios:
     name: Build iOS (.ipa)
@@ -78,3 +81,21 @@ jobs:
           name: SIIPOL-Jefatura-iOS-IPA
           path: build/SIIPOL-Jefatura.ipa
           retention-days: 30
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          tag_name: v1.0.0
+          name: "SIIPOL Jefatura v1.0.0 (iOS .IPA)"
+          body: |
+            ### 🛡️ SIIPOL Jefatura · VEN 9-1-1 Zulia (iOS Release)
+
+            - **Archivo Ejecutable**: `SIIPOL-Jefatura.ipa`
+            - Incluye pantalla de bloqueo con PIN de seguridad.
+            - Compatible con Sideloadly, TrollStore, AltStore, Scarlet o instalación en iOS.
+          draft: false
+          prerelease: false
+          files: build/SIIPOL-Jefatura.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
