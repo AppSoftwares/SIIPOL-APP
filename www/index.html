@@ -24,23 +24,48 @@ button.b{background:var(--g);color:#fff;border:0;border-radius:8px;padding:9px 1
 #md{position:fixed;inset:0;background:#000a;display:none;align-items:flex-end;justify-content:center;z-index:9}#md.on{display:flex}
 #mb{background:var(--c);width:100%;max-width:850px;max-height:92%;overflow:auto;border-radius:14px 14px 0 0;padding:16px}
 pre{white-space:pre-wrap;font:13px/1.5 system-ui;margin:0 0 10px}
-#pr{display:none}@media print{@page{size:A4 portrait;margin:5mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}body>*:not(#pr){display:none!important}#pr{display:block!important;padding:0!important;margin:0!important;width:100%!important}.fd{max-width:100%!important;margin:0!important;padding:12px!important;box-shadow:none!important;background:#d9c298!important;border:1px solid #b8a078!important}.fd:before{background:#e8d6b0!important;color:#4a3810!important}.pp{min-height:275mm!important;transform:none!important;box-shadow:none!important;padding:20px 24px!important;border:1px solid #c0b8a8!important;background:#ffffff!important}.sec-title{background:#1b2f6b!important;color:#ffffff!important}.stamp{border-color:#6b1425!important;color:#6b1425!important}.seal{border-color:#1b2f6b!important;color:#1b2f6b!important}}
+#pr{display:none}
+
+/* Estilos de Impresión / PDF A4 Estricto (1 sola hoja) */
+@media print{
+  @page{size:A4 portrait;margin:0}
+  html,body{margin:0!important;padding:0!important;height:100vh!important;max-height:297mm!important;overflow:hidden!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body>*:not(#pr){display:none!important}
+  #pr{display:block!important;width:210mm!important;height:297mm!important;max-height:297mm!important;padding:4mm 5mm!important;margin:0 auto!important;box-sizing:border-box!important;overflow:hidden!important;page-break-after:avoid!important;page-break-inside:avoid!important}
+  .fd{max-width:100%!important;height:288mm!important;max-height:288mm!important;margin:0!important;padding:10px 12px 8px!important;box-shadow:none!important;background:#d9c298!important;border:1px solid #b8a078!important;box-sizing:border-box!important;border-radius:4px!important}
+  .fd:before{background:#e8d6b0!important;color:#4a3810!important;top:-14px!important;height:14px!important;line-height:14px!important}
+  .pp{min-height:0!important;height:266mm!important;max-height:266mm!important;transform:none!important;box-shadow:none!important;padding:12px 18px 8px!important;border:1px solid #c0b8a8!important;background:#ffffff!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important}
+  .pp-hdr{padding-bottom:3px!important;margin-bottom:6px!important;border-bottom:2px double #1b2f6b!important}
+  .pp-hdr h4{font-size:9px!important;margin:0!important}
+  .pp-hdr h3{font-size:13px!important;margin:2px 0!important}
+  .pp-hdr small{font-size:9px!important}
+  .sec-title{background:#1b2f6b!important;color:#ffffff!important;padding:2px 6px!important;margin:6px 0 3px!important;font-size:10px!important;border-radius:2px!important}
+  .grid-2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:3px 12px!important}
+  .fr-box{padding:1px 0!important;border-bottom:1px solid #f1f5f9!important}
+  .fr-box b{font-size:8.5px!important;color:#64748b!important}
+  .fr-box span{font-size:11px!important;color:#0f172a!important}
+  .stamp{font-size:15px!important;padding:0 6px!important;top:12px!important;right:8px!important}
+  .seal{width:85px!important;height:85px!important;font-size:8.5px!important;top:42px!important;right:10px!important}
+  .barcode{margin-top:6px!important;padding-top:4px!important;font-size:8.5px!important;border-top:1px dashed #cbd5e1!important}
+}
+
 .fd{background:#d9c298;background-image:linear-gradient(160deg,#e8d6b0,#caaf7e);padding:24px 18px 20px;border-radius:6px;position:relative;color:#1a233a;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin-top:14px;box-shadow:0 8px 24px #0002}
 .fd:before{content:"EXPEDIENTE DE PERSONAL";font:700 10px system-ui,sans-serif;letter-spacing:1.5px;color:#5c4722;position:absolute;top:-16px;right:24px;width:170px;height:16px;background:#e8d6b0;border-radius:6px 6px 0 0;text-align:center;line-height:16px}
-.pp{background:#fff;transform:rotate(-0.5deg);box-shadow:2px 6px 16px #0003;padding:28px 24px 20px;position:relative;overflow:hidden;font-family:"Courier New",Courier,monospace;border:1px solid #d0c8b8;min-height:220mm}
+.pp{background:#fff;transform:rotate(-0.5deg);box-shadow:2px 6px 16px #0003;padding:24px 22px 18px;position:relative;overflow:hidden;font-family:"Courier New",Courier,monospace;border:1px solid #d0c8b8;min-height:220mm}
 .clip{position:absolute;top:-6px;left:12px}.ld{position:absolute;top:12px;left:56px;font-size:11px;color:#333;font-family:system-ui,sans-serif}
 .stamp{position:absolute;top:18px;right:10px;border:3px solid #6b1425;color:#6b1425;font:900 18px Impact,"Arial Black",sans-serif;letter-spacing:2px;padding:1px 8px;transform:rotate(-3deg);opacity:.85;background:#fff8}
 .seal{position:absolute;top:54px;right:12px;width:105px;height:105px;border:3px double #1b2f6b;border-radius:50%;color:#1b2f6b;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:700 10px/1.2 Georgia,serif;transform:rotate(-8deg);opacity:.55}
-.pp-hdr{border-bottom:2px double #1b2f6b;padding-bottom:8px;margin-bottom:14px;text-align:center;font-family:system-ui,sans-serif}
+.pp-hdr{border-bottom:2px double #1b2f6b;padding-bottom:8px;margin-bottom:10px;text-align:center;font-family:system-ui,sans-serif}
 .pp-hdr h4{margin:0;font:700 10px system-ui,sans-serif;letter-spacing:1px;color:#333;text-transform:uppercase}
 .pp-hdr h3{margin:3px 0;font:800 14px Georgia,serif;color:#6b1425;letter-spacing:0.5px}
 .pp-hdr small{font:600 10px system-ui,sans-serif;color:#475569}
-.sec-title{background:#1b2f6b;color:#fff;font:700 11px system-ui,sans-serif;letter-spacing:1.5px;padding:4px 8px;margin:14px 0 8px;text-transform:uppercase;border-radius:2px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.sec-title{background:#1b2f6b;color:#fff;font:700 11px system-ui,sans-serif;letter-spacing:1.5px;padding:3px 8px;margin:10px 0 6px;text-transform:uppercase;border-radius:2px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
 .fr-box{border-bottom:1px stroke #e2e8f0;padding:2px 0}
 .fr-box b{display:block;font:600 10px system-ui,sans-serif;color:#64748b;text-transform:uppercase;letter-spacing:0.5px}
-.fr-box span{font:700 13px "Courier New",monospace;color:#0f172a;word-break:break-word}
-.barcode{margin-top:18px;padding-top:10px;border-top:1px dashed #cbd5e1;display:flex;justify-content:space-between;align-items:center;font:10px system-ui,sans-serif;color:#64748b}
+.fr-box span{font:700 12.5px "Courier New",monospace;color:#0f172a;word-break:break-word}
+.barcode{margin-top:14px;padding-top:8px;border-top:1px dashed #cbd5e1;display:flex;justify-content:space-between;align-items:center;font:10px system-ui,sans-serif;color:#64748b}
+
 /* Lock Screen & Splash Gradient Style */
 #lock_screen{position:fixed;inset:0;background:linear-gradient(150deg,#6b1425 0%,#4a0d19 50%,#24050d 100%);color:#fff;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;transition:opacity 0.4s ease}
 #lock_screen .box{background:rgba(30,12,18,0.92);border:2px solid var(--o);border-radius:18px;padding:32px 24px;max-width:380px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,0.6);backdrop-filter:blur(10px)}
