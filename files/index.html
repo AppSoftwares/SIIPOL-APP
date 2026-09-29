@@ -41,13 +41,12 @@ pre{white-space:pre-wrap;font:13px/1.5 system-ui;margin:0 0 10px}
 .fr-box b{display:block;font:600 10px system-ui,sans-serif;color:#64748b;text-transform:uppercase;letter-spacing:0.5px}
 .fr-box span{font:700 13px "Courier New",monospace;color:#0f172a;word-break:break-word}
 .barcode{margin-top:18px;padding-top:10px;border-top:1px dashed #cbd5e1;display:flex;justify-content:space-between;align-items:center;font:10px system-ui,sans-serif;color:#64748b}
-/* Lock Screen Style */
-#lock_screen{position:fixed;inset:0;background:linear-gradient(145deg,#4a0d19,#1d040a);color:#fff;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
-#lock_screen .box{background:#231a1e;border:2px solid var(--o);border-radius:16px;padding:28px 22px;max-width:380px;width:100%;box-shadow:0 12px 36px #0008}
-#lock_screen h2{color:#f3e3be;margin:10px 0 4px;font-size:20px}
-#lock_screen p{color:#d1c2b0;font-size:13px;margin:0 0 18px}
+/* Lock Screen & Splash Gradient Style */
+#lock_screen{position:fixed;inset:0;background:linear-gradient(150deg,#6b1425 0%,#4a0d19 50%,#24050d 100%);color:#fff;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;transition:opacity 0.4s ease}
+#lock_screen .box{background:rgba(30,12,18,0.92);border:2px solid var(--o);border-radius:18px;padding:32px 24px;max-width:380px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,0.6);backdrop-filter:blur(10px)}
+#lock_screen h2{color:#f3e3be;margin:10px 0 4px;font-size:21px;font-family:Georgia,serif}
+#lock_screen p{color:#d1c2b0;font-size:13px;margin:0 0 18px;line-height:1.4}
 #lock_screen input{text-align:center;font-size:22px;letter-spacing:6px;border:2px solid var(--o);background:#120b0e;color:#fff;padding:12px;border-radius:10px;margin-bottom:14px}
-.shield-icon{font-size:54px;line-height:1;margin-bottom:8px}
 </style></head><body>
 <header><div><b>Jefatura del Servicio SIIPOL</b><small>VEN 9-1-1 · Estado Zulia</small></div><button id="hdr_logout" style="display:none;background:#ffffff33;border:1px solid #ffffff66;color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-weight:bold" onclick="doLogout()">🔒 Cerrar Sesión</button></header>
 <main id="v"></main>
@@ -56,8 +55,21 @@ pre{white-space:pre-wrap;font:13px/1.5 system-ui;margin:0 0 10px}
 <!-- Lock Screen / Access Control Overlay -->
 <div id="lock_screen" style="display:none">
   <div class="box">
-    <div class="shield-icon">🛡️</div>
-    <div style="font-size:11px;letter-spacing:1.5px;color:var(--o);font-weight:bold;text-transform:uppercase">SALA SITUACIONAL SIIPOL</div>
+    <!-- Emblematic Escudo SIIPOL 911 -->
+    <svg width="84" height="100" viewBox="0 0 100 120" style="margin-bottom:8px;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.6))">
+      <path d="M50 5 L90 20 V60 C90 90 50 115 50 115 C50 115 10 90 10 60 V20 Z" fill="url(#g_shield)" stroke="#b8893a" stroke-width="4"/>
+      <path d="M50 12 L82 25 V58 C82 83 50 105 50 105 C50 105 18 83 18 58 V25 Z" fill="none" stroke="#f3e3be" stroke-width="1.5" opacity="0.85"/>
+      <text x="50" y="55" font-family="Georgia, serif" font-size="28" font-weight="bold" fill="#f3e3be" text-anchor="middle">★</text>
+      <text x="50" y="78" font-family="system-ui, sans-serif" font-size="14" font-weight="900" fill="#ffffff" letter-spacing="1" text-anchor="middle">SIIPOL</text>
+      <text x="50" y="93" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#b8893a" letter-spacing="1" text-anchor="middle">VEN 9-1-1</text>
+      <defs>
+        <linearGradient id="g_shield" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#6b1425"/>
+          <stop offset="100%" stop-color="#3a0913"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div style="font-size:11px;letter-spacing:1.5px;color:var(--o);font-weight:bold;text-transform:uppercase">SALA SITUACIONAL VEN 9-1-1</div>
     <h2>Acceso Restringido</h2>
     <p id="lock_msg">Ingresa tu PIN o clave de seguridad personal para desbloquear el sistema:</p>
     <div id="lock_inputs">
