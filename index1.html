@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jefatura SIIPOL · VEN 9-1-1 Zulia</title>
+<style>
+:root{--g:#6b1425;--g2:#4a0d19;--o:#b8893a;--bg:#f3f1ee;--c:#fff;--t:#1d1d22;--m:#6d6d78;--l:#ded9d3}
+@media(prefers-color-scheme:dark){:root{--bg:#17161a;--c:#232228;--t:#ececf0;--m:#a0a0ab;--l:#37363d}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.45 system-ui,sans-serif;padding-bottom:70px}
+header{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;border-bottom:3px solid var(--o)}
+header b{font:600 19px Georgia,serif;display:block}header small{opacity:.8}
+main{max-width:900px;margin:auto;padding:12px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--c);border-top:1px solid var(--l);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:0;color:var(--m);padding:10px 2px;font-size:11px}nav button.on{color:var(--g);font-weight:700;box-shadow:inset 0 3px var(--o)}
+@media(prefers-color-scheme:dark){nav button.on{color:#e6a0b0}}
+.card{background:var(--c);border:1px solid var(--l);border-radius:10px;padding:12px;margin:0 0 10px}
+h2{font:600 18px Georgia,serif;margin:6px 0 10px}h3{margin:0 0 6px;font-size:15px}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.k div{background:var(--c);border:1px solid var(--l);border-radius:10px;padding:10px}.k b{font:700 26px Georgia,serif;display:block}.k span{color:var(--m);font-size:12px}
+input,select,textarea{width:100%;padding:9px;border:1px solid var(--l);border-radius:8px;background:var(--c);color:var(--t);font:inherit;margin:0 0 8px}
+button.b{background:var(--g);color:#fff;border:0;border-radius:8px;padding:9px 13px;font:inherit;margin:2px 4px 2px 0}button.b.s{background:var(--c);color:var(--g);border:1px solid var(--g)}
+@media(prefers-color-scheme:dark){button.b.s{color:#e6a0b0;border-color:#e6a0b0}}
+.r{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--l);cursor:pointer}.r:last-child{border:0}.r small{color:var(--m)}
+.tag{font-size:11px;border-radius:20px;padding:2px 8px;background:#e9e3d6;color:#5a4614;white-space:nowrap;align-self:center}.tag.v{background:#f6d9de;color:var(--g)}
+.bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}.bar i{display:block;height:14px;background:var(--g);border-radius:3px;min-width:2px}.bar i.p{background:var(--o)}.bar span{width:110px;flex:none}
+#md{position:fixed;inset:0;background:#000a;display:none;align-items:flex-end;justify-content:center;z-index:9}#md.on{display:flex}
+#mb{background:var(--c);width:100%;max-width:700px;max-height:88%;overflow:auto;border-radius:14px 14px 0 0;padding:16px}
+pre{white-space:pre-wrap;font:13px/1.5 system-ui;margin:0 0 10px}
+#pr{display:none}@media print{body>*:not(#pr){display:none!important}#pr{display:block;color:#000;font:13px/1.5 serif;padding:20px}#pr h1{font-size:17px;border-bottom:2px solid #6b1425}}
+.fd{background:#e4d3ab;background-image:linear-gradient(160deg,#ecdcb6,#d9c592);padding:26px 16px 18px;border-radius:4px 4px 8px 8px;position:relative;color:#1b2540;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin-top:14px}
+.fd:before{content:"";position:absolute;top:-14px;right:28px;width:110px;height:16px;background:#e4d3ab;border-radius:8px 8px 0 0}
+.pp{background:#fff;transform:rotate(-1deg);box-shadow:2px 4px 10px #0005;padding:30px 14px 16px;position:relative;overflow:hidden;font-family:"Courier New",monospace}
+.clip{position:absolute;top:-6px;left:12px}.ld{position:absolute;top:12px;left:56px;font-size:11px;color:#333}
+.stamp{position:absolute;top:22px;right:10px;border:3px solid #4b2a22;color:#4b2a22;font:900 20px Impact,"Arial Black",sans-serif;letter-spacing:2px;padding:1px 10px;transform:rotate(-3deg);opacity:.88;background:#fff8}
+.seal{position:absolute;top:66px;right:14px;width:112px;height:112px;border:3px double #cf8f99;border-radius:50%;color:#cf8f99;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:700 11px/1.3 Georgia,serif;transform:rotate(-9deg);opacity:.6}
+.gap{height:68px}.g{height:12px}.fr{display:grid;grid-template-columns:36% 1fr;gap:12px;margin:5px 0;font-size:13px}.fr b{text-align:right;font:600 13px system-ui,sans-serif;color:#111}.fr span{word-break:break-word;color:#1b2f6b}
+@media print{@page{margin:10mm}.fd{max-width:170mm;margin:auto}}
+header{position:relative}.lo{position:absolute;right:14px;top:calc(14px + env(safe-area-inset-top,0px));background:#fff2;color:#fff;border:1px solid #fff5;border-radius:8px;padding:5px 10px;font-size:12px}
+#lg{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 20%,#8a1c33,#2a0710);padding:20px}
+.lb{background:var(--c);width:100%;max-width:360px;border-radius:14px;padding:26px 22px;border-top:4px solid var(--o);text-align:center;box-shadow:0 20px 50px #0008}
+.lb h1{font:700 30px Georgia,serif;letter-spacing:5px;margin:2px 0;color:var(--o)}.em{font-size:34px;color:var(--o)}.lb small{color:var(--m)}
+#le{color:#c0243f;min-height:22px;font-size:13px;margin-top:8px}#uv{margin-top:10px;font-size:12px;color:var(--m)}#uv a{color:var(--g);text-decoration:underline}
+</style></head><body>
+<header><b>Jefatura del Servicio SIIPOL</b><small>VEN 9-1-1 · Estado Zulia</small><button class="lo" onclick="salir()">Salir</button></header>
+<main id="v"></main>
+<nav id="nav"></nav><div id="md"><div id="mb"></div></div><div id="pr"></div><div id="lg"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),H=(e,h)=>e.innerHTML=h;
+const ORG=['FANB (Armada)','FANB (Ejército)','FANB (GNB)','CPBDEZ','Polimaracaibo','Polimara','Poliguagira','Polilagunillas','Policabimas','Polisur','Policañada','Policon','CICPC'];
+const DEF={p:[],snap:{},cfg:{url:'',last:0,firma:'Jefatura del Servicio SIIPOL, VEN 9-1-1 Zulia',
+ fechas:[{n:'Aniversario de la Armada',d:'07-24',o:'Armada'},{n:'Aniversario del Ejército (Batalla de Carabobo)',d:'06-24',o:'Ejército'},{n:'Aniversario de la GNB',d:'08-04',o:'GNB'},{n:'Día del Policía',d:'11-25',o:''}]}};
+let S=JSON.parse(localStorage.getItem('sj')||'null')||DEF;
+const save=()=>localStorage.setItem('sj',JSON.stringify(S));
+const today=()=>{const d=new Date();return d.toISOString().slice(0,10)};
+const fmt=d=>d?d.split('-').reverse().join('/'):'—';
+const onVac=(p,d=today())=>p.vac&&p.vac.d<=d&&d<=p.vac.h;
+const orgOf=p=>p.org||'Sin organismo';
+/* ---------- importación ---------- */
+const K=(o,k)=>{const h=Object.keys(o).find(x=>x.toUpperCase().includes(k));return h?String(o[h]).trim():''};
+const D=v=>{if(v instanceof Date)return new Date(v.getTime()+432e5).toISOString().slice(0,10);
+ const m=String(v).match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);return m?`${m[3]}-${m[2].padStart(2,0)}-${m[1].padStart(2,0)}`:''};
+function ingest(rows){let n=0;rows.forEach(o=>{const nombre=K(o,'APELLIDOS');if(!nombre)return;
+ const p={nombre,ci:K(o,'CÉDULA'),fn:D(o[Object.keys(o).find(x=>x.includes('F/N'))]),org:K(o,'CUERPO'),cred:K(o,'CREDENCIAL'),rango:K(o,'RANGO'),
+ ofi:K(o,'OFICINA'),mail:K(o,'POR FAVOR').toLowerCase(),tel:K(o,'TELÉFONO'),siipol:K(o,'USUARIO SIIPOL'),est:K(o,'ESTATUS'),sangre:K(o,'SANGRE')};
+ const i=S.p.findIndex(x=>x.ci&&x.ci===p.ci||x.nombre===p.nombre);
+ if(i>=0)S.p[i]={...S.p[i],...p,vac:S.p[i].vac,nota:S.p[i].nota};else S.p.push(p);n++});
+ S.cfg.last=Date.now();snap();save();return n}
+function snap(){const k=today().slice(0,7),by={};S.p.forEach(p=>by[orgOf(p)]=(by[orgOf(p)]||0)+1);
+ S.snap[k]={t:S.p.length,v:S.p.filter(p=>onVac(p)).length,by}}
+async function sync(manual){if(!S.cfg.url){if(manual)alert('Configura primero el enlace CSV de la hoja de Google.');return}
+ try{const r=await fetch(S.cfg.url);const wb=XLSX.read(await r.text(),{type:'string',cellDates:true});
+ const n=ingest(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]));if(manual)alert(n+' registros sincronizados');if(sessionStorage.getItem('ses'))go(cur)}
+ catch(e){if(manual)alert('Sin conexión o enlace inválido. Se mantienen los datos guardados.')}}
+function loadFile(f){const r=new FileReader();r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+ alert(ingest(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]))+' registros importados');go('ini')};r.readAsArrayBuffer(f)}
+/* ---------- salida: PDF / WhatsApp / correo ---------- */
+function out(t,txt,mail=''){H($('#mb'),`<h2>${t}</h2><pre>${txt.replace(/</g,'&lt;')}</pre>
+<button class="b" onclick="pdf()">PDF / Imprimir</button>
+<button class="b s" onclick="wa()">WhatsApp</button>
+<button class="b s" onclick="ml()">Correo</button>
+<button class="b s" onclick="cp()">Copiar</button><button class="b s" onclick="$('#md').classList.remove('on')">Cerrar</button>`);
+ window.O={t,txt,mail};$('#md').classList.add('on')}
+const pdf=()=>{H($('#pr'),`<h1>${O.t}</h1><pre>${O.txt.replace(/</g,'&lt;')}</pre><p>${S.cfg.firma}</p>`);print()};
+const wa=()=>open('https://wa.me/?text='+encodeURIComponent(O.t+'\n\n'+O.txt));
+const ml=()=>location.href=`mailto:${O.mail}?subject=${encodeURIComponent(O.t)}&body=${encodeURIComponent(O.txt+'\n\n'+S.cfg.firma)}`;
+const cp=()=>navigator.clipboard.writeText(O.txt);
+function parte(d){const a=S.p.filter(p=>!onVac(p,d)),v=S.p.filter(p=>onVac(p,d));
+ out('Parte del servicio SIIPOL · '+fmt(d),`Total: ${S.p.length} | Activos: ${a.length} | De vacaciones: ${v.length}\n\nDE VACACIONES:\n`+
+ (v.map(p=>`- ${p.nombre} (${orgOf(p)}) regresa ${fmt(p.vac.h)}`).join('\n')||'Ninguno')+'\n\nPOR ORGANISMO:\n'+
+ ORG.map(o=>`${o}: ${a.filter(p=>p.org.toLowerCase().includes(o.toLowerCase().replace(/fanb \(|\)/g,'')) ).length}`).join('\n'))}
+/* ---------- fechas ---------- */
+const bd=(p)=>{if(!p.fn)return 999;const n=new Date(),[y,m,d]=p.fn.split('-').map(Number);let x=new Date(n.getFullYear(),m-1,d);
+ if(x<new Date(n.getFullYear(),n.getMonth(),n.getDate()))x=new Date(n.getFullYear()+1,m-1,d);return Math.round((x-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5)};
+const felic=p=>out('Felicitaciones por su cumpleaños',`Estimado(a) ${p.rango} ${p.nombre}:\n\nLa Jefatura del Servicio SIIPOL del VEN 9-1-1 Zulia le desea un feliz cumpleaños, junto con éxitos en su labor al servicio de la ciudadanía.\n\nFeliz día.`,p.mail);
+const felicOrg=(f)=>out(f.n,`Estimado personal:\n\nEn ocasión de ${f.n.toLowerCase()}, la Jefatura del Servicio SIIPOL del VEN 9-1-1 Zulia les extiende su reconocimiento por su compromiso y dedicación.\n\nFeliz día.`,
+ S.p.filter(p=>!f.o||p.org.includes(f.o)).map(p=>p.mail).filter(Boolean).join(','));
+/* ---------- jurídico y planillas ---------- */
+const LEY=[['Art. 1','El SIIPOL es de uso exclusivo del CICPC.'],['Art. 2','Solo el titular de la Dirección General Nacional del CICPC puede facilitar su información a organismos policiales que coadyuven en la investigación penal.'],['Art. 3','El titular de la Dirección General podrá autorizar mecanismos de intercambio de información con instituciones en materia científica, penal y criminalística.'],['Art. 4','El CICPC promoverá el fortalecimiento del centro de información estratégico, para regularizar el uso del sistema.'],['Art. 5','Dentro de 60 días hábiles se crearán protocolos y manuales internos de uso, control y supervisión; solo modificables por innovaciones tecnológicas.'],['Art. 6','Se harán supervisiones y auditorías permanentes del uso correcto del SIIPOL.'],['Art. 7','El funcionario del CICPC en comisión de servicio en otras instituciones no podrá usar el SIIPOL.'],['Art. 8','Los usuarios autorizados están sujetos a los protocolos internos de uso, control y supervisión.'],['Art. 9','El uso indebido o no autorizado acarrea sanciones administrativas, penales y civiles.'],['Art. 10','Vigencia desde su publicación en Gaceta Oficial.']];
+const PLAN={'Solicitud de usuario SIIPOL':'SOLICITUD DE USUARIO SIIPOL\n\nApellidos y nombres:\nC.I.:\nOrganismo:\nRango / Jerarquía:\nN.º de credencial:\nOficina de adscripción:\nCorreo:\nTeléfono:\n\nDeclaro conocer las normas de uso del SIIPOL.\n\nFirma: ____________   Fecha: ____/____/______',
+'Compromiso de confidencialidad':'COMPROMISO DE CONFIDENCIALIDAD\n\nYo, ______________, C.I. ______________, me comprometo a usar el SIIPOL solo para fines de investigación penal autorizados, y a no divulgar su información. Conozco que el uso indebido acarrea sanciones administrativas, penales y civiles (Art. 9, Res. N.º 196, Gaceta Oficial N.º 40.422).\n\nFirma: ____________   Fecha: ____/____/______',
+'Bienvenida a nuevo usuario':'Bienvenido(a) a la Sala SIIPOL del VEN 9-1-1 Zulia.\n\nPara su registro, envíe: nombre completo, cédula, organismo, credencial, rango, oficina, correo y teléfono, y complete el formulario de actualización de datos del personal.'};
+/* ---------- vistas ---------- */
+let cur='ini';const TABS=[['ini','Inicio'],['per','Personal'],['est','Estadísticas'],['fec','Fechas'],['jur','Jurídico'],['cfg','Ajustes']];
+const stat=p=>onVac(p)?`<span class="tag v">Vacaciones · regresa ${fmt(p.vac.h)}</span>`:'<span class="tag">Activo</span>';
+function go(t){cur=t;H($('#nav'),TABS.map(x=>`<button class="${x[0]==t?'on':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join(''));const v=$('#v');
+ if(t=='ini'){const v1=S.p.filter(p=>onVac(p)),ret=S.p.filter(p=>p.vac&&p.vac.h>=today()&&p.vac.h<=new Date(Date.now()+7*864e5).toISOString().slice(0,10)),b=S.p.filter(p=>bd(p)==0);
+ H(v,`<h2>Resumen</h2><div class="k"><div><b>${S.p.length}</b><span>Funcionarios</span></div><div><b>${S.p.length-v1.length}</b><span>Activos</span></div><div><b>${v1.length}</b><span>De vacaciones</span></div><div><b>${b.length}</b><span>Cumplen hoy</span></div></div>
+ ${S.p.length?'':'<div class="card">Aún no hay datos. Ve a <b>Ajustes</b> e importa tu Excel o enlaza la hoja de Google.</div>'}
+ <div class="card"><h3>Regresan en 7 días</h3>${ret.map(p=>`<div class="r"><span>${p.nombre}<br><small>${orgOf(p)}</small></span><small>${fmt(p.vac.h)}</small></div>`).join('')||'<small>Nadie por ahora.</small>'}</div>
+ <div class="card"><h3>Parte del servicio por fecha</h3><input type="date" id="pd" value="${today()}"><button class="b" onclick="parte($('#pd').value)">Generar parte</button></div>
+ ${b.length?`<div class="card"><h3>Cumpleaños de hoy</h3>${b.map(p=>`<div class="r" onclick="felic(S.p[${S.p.indexOf(p)}])"><span>${p.nombre}</span><span class="tag">Felicitar</span></div>`).join('')}</div>`:''}`)}
+ if(t=='per'){H(v,`<h2>Personal</h2><input id="q" placeholder="Buscar nombre, cédula, credencial…" oninput="lst()"><select id="fo" onchange="lst()"><option value="">Todos los organismos</option>${ORG.map(o=>`<option>${o}</option>`).join('')}</select><div class="card" id="ls"></div>`);lst()}
+ if(t=='est'){const mx=Math.max(1,...ORG.map(o=>S.p.filter(p=>p.org.toLowerCase().includes(o.toLowerCase().replace(/fanb \(|\)/g,''))).length)),ks=Object.keys(S.snap).sort(),a=S.snap[ks[ks.length-1]],b=S.snap[ks[ks.length-2]];
+ H(v,`<h2>Estadísticas</h2><div class="card"><h3>Funcionarios por organismo</h3>${ORG.map(o=>{const n=S.p.filter(p=>p.org.toLowerCase().includes(o.toLowerCase().replace(/fanb \(|\)/g,''))).length,q=b?b.by[o]||0:0;
+ return`<div class="bar"><span>${o}</span><i style="width:${n/mx*55}%"></i>${b?`<i class="p" style="width:${q/mx*55}%;opacity:.6"></i>`:''}<b>${n}</b></div>`}).join('')}${b?'<small>Barra dorada: mes anterior</small>':''}</div>
+ <div class="card"><h3>Comparación mensual</h3>${a?`Mes ${ks[ks.length-1]}: <b>${a.t}</b> funcionarios, <b>${a.v}</b> de vacaciones.<br>`:'Sin datos.'}${b?`Mes ${ks[ks.length-2]}: <b>${b.t}</b> funcionarios, <b>${b.v}</b> de vacaciones. Variación: <b>${a.t-b.t>=0?'+':''}${a.t-b.t}</b>`:'<small>La comparación aparece al cerrar el primer mes.</small>'}</div>
+ <button class="b" onclick="out('Estadística SIIPOL',ORG.map(o=>o+': '+S.p.filter(p=>p.org.includes(o.replace(/FANB \\(|\\)/g,''))).length).join('\\n'))">Exportar / enviar</button>`)}
+ if(t=='fec'){const l=S.p.filter(p=>p.fn).sort((a,b)=>bd(a)-bd(b)).slice(0,25);
+ H(v,`<h2>Cumpleaños próximos</h2><div class="card">${l.map(p=>`<div class="r" onclick="felic(S.p[${S.p.indexOf(p)}])"><span>${p.nombre}<br><small>${orgOf(p)}</small></span><span><small>${fmt(p.fn).slice(0,5)}</small> <span class="tag">${bd(p)==0?'Hoy':'en '+bd(p)+' d'}</span></span></div>`).join('')||'<small>Sin fechas de nacimiento.</small>'}</div>
+ <h2>Fechas institucionales</h2><div class="card">${S.cfg.fechas.map((f,i)=>`<div class="r" onclick="felicOrg(S.cfg.fechas[${i}])"><span>${f.n}<br><small>Verifica la fecha en Ajustes</small></span><span class="tag">${f.d.split('-').reverse().join('/')}</span></div>`).join('')}</div>
+ <div class="card"><small>Al tocar, se prepara el mensaje institucional para enviarlo por correo o WhatsApp. El envío 100 % automático sin servidor no es posible; la app te avisa en Inicio y lo envías con un toque.</small></div>`)}
+ if(t=='jur'){H(v,`<h2>Jurídico</h2><input id="jq" placeholder="Buscar en las normas…" oninput="jf()"><div class="card" id="jl"></div>
+ <div class="card"><small>Resolución N.º 196 (27/05/2014), Gaceta Oficial N.º 40.422 del 29/05/2014. Resumen; consulta el texto oficial.</small></div>
+ <h2>Planillas</h2><div class="card">${Object.keys(PLAN).map(k=>`<div class="r" onclick="out('${k}',PLAN['${k}'])"><span>${k}</span><span class="tag">Abrir</span></div>`).join('')}</div>
+ <h2>Notas jurídicas</h2><textarea id="jn" rows="4" placeholder="Tus criterios y precedentes…" onchange="S.cfg.nj=this.value;save()">${S.cfg.nj||''}</textarea>`);jf()}
+ if(t=='cfg'){H(v,`<h2>Ajustes</h2><div class="card"><h3>Importar Excel / CSV</h3><input type="file" accept=".xlsx,.xls,.csv" onchange="loadFile(this.files[0])"></div>
+ <div class="card"><h3>Sincronización semanal</h3><small>En Google Sheets: Archivo → Compartir → Publicar en la web → CSV. Pega el enlace.</small><input id="u" value="${S.cfg.url}" placeholder="https://docs.google.com/…/pub?output=csv" onchange="S.cfg.url=this.value;save()">
+ <button class="b" onclick="sync(true)">Sincronizar ahora</button><br><small>Última: ${S.cfg.last?new Date(S.cfg.last).toLocaleString():'nunca'}</small></div>
+ <div class="card"><h3>Firma de mensajes</h3><input value="${S.cfg.firma}" onchange="S.cfg.firma=this.value;save()"></div>
+ <div class="card"><h3>Actualizaciones · versión ${VER}</h3><small>Enlace a un archivo version.json alojado en GitHub, Drive u otro sitio.</small><input value="${S.cfg.verUrl||''}" placeholder="https://…/version.json" onchange="S.cfg.verUrl=this.value;save()"><button class="b" onclick="upd(true)">Buscar actualización</button></div>
+ <div class="card"><h3>Cuenta</h3><input id="cp" type="password" placeholder="Nueva clave (mín. 6)"><button class="b" onclick="chP()">Cambiar mi clave</button>${(S.users.find(x=>x.u==sessionStorage.getItem('ses'))||{}).r=='jefe'?`<h3 style="margin-top:12px">Nuevo usuario (operador)</h3><input id="nu" placeholder="Usuario"><input id="np" type="password" placeholder="Clave (mín. 6)"><button class="b s" onclick="addU()">Crear usuario</button><br><small>Usuarios: ${S.users.map(x=>x.u).join(', ')}</small>`:''}</div>
+ <div class="card"><h3>Respaldo</h3><button class="b s" onclick="out('Respaldo JSON',JSON.stringify(S))">Exportar datos</button></div>`)}}
+function lst(){const q=$('#q').value.toLowerCase(),o=$('#fo').value.replace(/FANB \(|\)/g,'').toLowerCase();
+ H($('#ls'),S.p.map((p,i)=>[p,i]).filter(([p])=>(!o||p.org.toLowerCase().includes(o))&&(p.nombre+p.ci+p.cred).toLowerCase().includes(q)).slice(0,80).map(([p,i])=>`<div class="r" onclick="ficha(${i})"><span>${p.nombre}<br><small>${p.rango} · ${orgOf(p)}</small></span>${stat(p)}</div>`).join('')||'<small>Sin resultados.</small>')}
+const edad=f=>{if(!f)return'—';const n=new Date(),b=new Date(f);let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return a};
+const dos=p=>{const R=(l,v)=>`<div class="fr"><b>${l}:</b><span>${v||'—'}</span></div>`,g='<div class="g"></div>';
+return `<div class="fd"><div class="pp"><svg class="clip" width="34" height="72" viewBox="0 0 34 72"><path d="M10 44V15a7 7 0 0 1 14 0v42a11 11 0 0 1-22 0V22" fill="none" stroke="#8b929c" stroke-width="3" stroke-linecap="round"/></svg>
+<small class="ld">Última actualización: ${S.cfg.last?fmt(new Date(S.cfg.last).toISOString().slice(0,10)):'—'}</small>
+<div class="stamp">CONFIDENCIAL</div><div class="seal">★<br>USO OFICIAL<br>SIIPOL<br>VEN 9-1-1<br>★</div><div class="gap"></div>
+${R('Nombre completo',p.nombre)}${R('Cédula',p.ci)}${g}${R('Edad',edad(p.fn))}${R('Fecha de nac.',fmt(p.fn))}${g}
+${R('Organismo',orgOf(p))}${R('Rango',p.rango)}${R('Credencial',p.cred)}${g}${R('Adscripción',p.ofi)}${g}
+${R('Teléfono',p.tel)}${R('Correo',p.mail)}${g}${R('Usuario SIIPOL',p.siipol)}${R('Tipo de sangre',p.sangre)}
+${R('Estatus',onVac(p)?'De vacaciones hasta '+fmt(p.vac.h):'Activo')}${g}${R('Notas',p.nota)}<div class="gap"></div></div></div>`};
+const dtxt=p=>`FICHA DE PERSONAL\n${p.nombre}\nC.I.: ${p.ci}\nEdad: ${edad(p.fn)} (${fmt(p.fn)})\nOrganismo: ${orgOf(p)}\nRango: ${p.rango}\nCredencial: ${p.cred}\nAdscripción: ${p.ofi}\nTeléfono: ${p.tel}\nCorreo: ${p.mail}\nUsuario SIIPOL: ${p.siipol}\nSangre: ${p.sangre}\nEstatus: ${onVac(p)?'De vacaciones hasta '+fmt(p.vac.h):'Activo'}\nNotas: ${p.nota||'—'}`;
+const dpdf=()=>{H($('#pr'),dos(S.p[PI]));print()};
+const dsend=k=>{const p=S.p[PI];window.O={t:'Ficha '+p.nombre,txt:dtxt(p),mail:p.mail};k=='wa'?wa():ml()};
+let PI=0;
+function ficha(i){const p=S.p[i];PI=i;const c="$('#md').classList.remove('on')";
+ H($('#mb'),dos(p)+`<div style="margin-top:12px"><button class="b" onclick="dpdf()">Descargar PDF</button><button class="b s" onclick="dsend('wa')">WhatsApp</button><button class="b s" onclick="dsend('ml')">Correo</button></div>
+ <details style="margin-top:10px"><summary><b>Vacaciones y notas</b></summary><br>Desde<input type="date" id="vd" value="${p.vac?.d||''}">Hasta (regreso)<input type="date" id="vh" value="${p.vac?.h||''}">
+ <textarea id="nt" rows="2" placeholder="Notas">${p.nota||''}</textarea>
+ <button class="b" onclick="const q=S.p[${i}];q.nota=$('#nt').value;if($('#vd').value&&$('#vh').value)q.vac={d:$('#vd').value,h:$('#vh').value};save();${c};go('per')">Guardar</button>
+ <button class="b s" onclick="delete S.p[${i}].vac;save();${c};go('per')">Quitar vacaciones</button></details>
+ <button class="b s" style="margin-top:8px" onclick="${c}">Cerrar</button>`);$('#md').classList.add('on')}
+function jf(){const q=$('#jq').value.toLowerCase();H($('#jl'),LEY.filter(a=>(a[0]+a[1]).toLowerCase().includes(q)).map(a=>`<div class="r" style="cursor:default"><b>${a[0]}</b><span style="flex:1">${a[1]}</span></div>`).join(''))}
+$('#md').onclick=e=>{if(e.target.id=='md')e.target.classList.remove('on')};
+/* ---------- acceso y versión ---------- */
+const VER='1.1.0';let UPD=null,fails=0,lock=0,booted=0;S.users=S.users||[];
+const hs=async t=>{const b=new TextEncoder().encode('sj|'+t);if(window.crypto&&crypto.subtle){const h=await crypto.subtle.digest('SHA-256',b);return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}let x=5381;for(const c of b)x=(x*33^c)>>>0;return'f'+x};
+const salt=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+function gate(){const L=$('#lg');if(sessionStorage.getItem('ses')){L.style.display='none';go('ini');if(!booted){booted=1;if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync();upd(false)}return}
+ const f=!S.users.length;
+ H(L,`<div class="lb"><div class="em">★</div><h1>SIIPOL</h1><small>Jefatura del Servicio · VEN 9-1-1 Zulia</small><br><br>
+ ${f?'<small>Primer uso: crea la cuenta de la Jefatura.</small><br><br>':''}
+ <input id="lu" placeholder="Usuario" autocapitalize="off" autocomplete="username"><input id="lp" type="password" placeholder="Clave" autocomplete="current-password" onkeydown="if(event.key=='Enter')enter()">
+ ${f?'<input id="lp2" type="password" placeholder="Repetir clave">':''}<button class="b" style="width:100%;padding:12px" onclick="enter()">${f?'Crear cuenta':'Ingresar'}</button>
+ <div id="le"></div><div id="uv">Versión ${VER} · <a onclick="upd(true)">Buscar actualización</a></div></div>`);
+ L.style.display='flex';upd(false)}
+async function enter(){const u=$('#lu').value.trim().toLowerCase(),p=$('#lp').value,e=$('#le');
+ if(Date.now()<lock){e.textContent='Espera '+Math.ceil((lock-Date.now())/1000)+' s';return}
+ if(!S.users.length){if(!u||p.length<6){e.textContent='Usuario y clave de mínimo 6 caracteres';return}
+  if(p!=$('#lp2').value){e.textContent='Las claves no coinciden';return}
+  const s=salt();S.users.push({u,s,h:await hs(s+p),r:'jefe'});save();return login(u)}
+ const x=S.users.find(y=>y.u==u);if(x&&x.h==await hs(x.s+p))return login(u);
+ if(++fails>=5){lock=Date.now()+30000;fails=0}e.textContent='Usuario o clave incorrectos'}
+const login=u=>{sessionStorage.setItem('ses',u);gate()};
+const salir=()=>{sessionStorage.clear();gate()};
+async function upd(man){const el=$('#uv');if(!S.cfg.verUrl){if(man)alert('Configura el enlace de actualización en Ajustes.');return}
+ try{const j=await(await fetch(S.cfg.verUrl+'?t='+Date.now(),{cache:'no-store'})).json(),a=j.version.split('.').map(Number),c=VER.split('.').map(Number);
+ if((a[0]-c[0]||a[1]-c[1]||a[2]-c[2])>0){UPD=j;const h=`<b>Nueva versión ${j.version}</b><br><small>${j.notas||''}</small><br><button class="b" onclick="aplicar()">Actualizar ahora</button>`;
+  if(el)H(el,h);else if(man)alert('Nueva versión '+j.version)}else if(man)alert('Ya tienes la última versión ('+VER+')')}
+ catch(e){if(man)alert('No se pudo verificar. Revisa la conexión y el enlace.')}}
+function aplicar(){if(UPD.apk&&window.Capacitor)return open(UPD.apk,'_system');location.href=location.pathname+'?v='+UPD.version}
+async function addU(){const u=$('#nu').value.trim().toLowerCase(),p=$('#np').value;if(!u||p.length<6)return alert('Usuario y clave (mín. 6)');if(S.users.some(x=>x.u==u))return alert('Ya existe');
+ const s=salt();S.users.push({u,s,h:await hs(s+p),r:'operador'});save();alert('Usuario creado');go('cfg')}
+async function chP(){const m=S.users.find(x=>x.u==sessionStorage.getItem('ses')),p=$('#cp').value;if(p.length<6)return alert('Mínimo 6 caracteres');m.s=salt();m.h=await hs(m.s+p);save();alert('Clave cambiada')}
+
+addEventListener('online',()=>sync());
+gate();
+</script></body></html>
