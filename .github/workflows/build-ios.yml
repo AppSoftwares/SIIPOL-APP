@@ -31,23 +31,44 @@ jobs:
             npx cap add ios
           fi
           npx cap sync ios
+          if [ -d "ios/App" ]; then
+            cd ios/App
+            pod install || true
+            cd ../..
+          fi
+          echo "=== Contents of ios/App ==="
+          ls -la ios/App || true
 
       - name: Build iOS Archive (xcodebuild)
         run: |
-          xcodebuild -workspace ios/App/App.xcworkspace \
-                     -scheme App \
-                     -configuration Release \
-                     -sdk iphoneos \
-                     -archivePath build/App.xcarchive \
-                     CODE_SIGN_IDENTITY="" \
-                     CODE_SIGNING_REQUIRED=NO \
-                     CODE_SIGNING_ALLOWED=NO \
-                     archive
+          if [ -d "ios/App/App.xcworkspace" ]; then
+            echo "Building with App.xcworkspace"
+            xcodebuild -workspace ios/App/App.xcworkspace \
+                       -scheme App \
+                       -configuration Release \
+                       -sdk iphoneos \
+                       -archivePath build/App.xcarchive \
+                       CODE_SIGN_IDENTITY="" \
+                       CODE_SIGNING_REQUIRED=NO \
+                       CODE_SIGNING_ALLOWED=NO \
+                       archive
+          else
+            echo "Building with App.xcodeproj"
+            xcodebuild -project ios/App/App.xcodeproj \
+                       -scheme App \
+                       -configuration Release \
+                       -sdk iphoneos \
+                       -archivePath build/App.xcarchive \
+                       CODE_SIGN_IDENTITY="" \
+                       CODE_SIGNING_REQUIRED=NO \
+                       CODE_SIGNING_ALLOWED=NO \
+                       archive
+          fi
 
       - name: Package .ipa File
         run: |
           mkdir -p build/Payload
-          cp -R build/App.xcarchive/Products/Applications/App.app build/Payload/
+          cp -R build/App.xcarchive/Products/Applications/*.app build/Payload/
           cd build
           zip -r SIIPOL-Jefatura.ipa Payload
 
