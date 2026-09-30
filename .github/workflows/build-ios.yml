@@ -16,13 +16,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm install
-      - name: Generar iconos y splash
-        run: |
-          if [ -d assets ]; then npx capacitor-assets generate --ios || true; fi
       - name: Preparar plataforma iOS
         run: |
           [ -d ios ] || npx cap add ios
-          npx cap sync ios
+      - name: Generar iconos y splash
+        run: |
+          test -f assets/icon-only.png || (echo "FALTA assets/icon-only.png" && exit 1)
+          npx capacitor-assets generate --ios
+      - name: Sincronizar Capacitor
+        run: npx cap sync ios
       - name: Ajustar Info.plist
         run: |
           P=ios/App/App/Info.plist
