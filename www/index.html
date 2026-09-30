@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://docs.google.com https://*.googleusercontent.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#4a0d19">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Jefatura SIIPOL · VEN 9-1-1 Zulia</title>
 <style>
 :root{--g:#6b1425;--g2:#4a0d19;--o:#b8893a;--bg:#f3f1ee;--c:#fff;--t:#1d1d22;--m:#6d6d78;--l:#ded9d3}
@@ -72,6 +75,18 @@ pre{white-space:pre-wrap;font:13px/1.5 system-ui;margin:0 0 10px}
 #lock_screen h2{color:#f3e3be;margin:10px 0 4px;font-size:21px;font-family:Georgia,serif}
 #lock_screen p{color:#d1c2b0;font-size:13px;margin:0 0 18px;line-height:1.4}
 #lock_screen input{text-align:left;font-size:15px;border:2px solid var(--o);background:#120b0e;color:#fff;padding:11px 12px;border-radius:10px;margin-bottom:12px;width:100%}
+
+/* ---------- Apariencia nativa (iOS/Android) ---------- */
+html{-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+input,textarea,select{-webkit-user-select:text;user-select:text;font-size:16px;-webkit-appearance:none;appearance:none;border-radius:10px}
+button,.r,nav button{touch-action:manipulation}
+nav button{min-height:49px}button.b{min-height:44px}.r{min-height:44px}
+button:active,.r:active,.tag:active{opacity:.55;transition:opacity .05s}
+nav{background:color-mix(in srgb,var(--c) 82%,transparent);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.r:after{content:"\203A";color:var(--m);font-size:20px;align-self:center;margin-left:4px}
+.r .tag+*,.r:has(.tag):after{display:none}
+.card{border-radius:14px;box-shadow:none}
 </style></head><body>
 <header><div><b>Jefatura del Servicio SIIPOL</b><small>VEN 9-1-1 · Estado Zulia</small></div><button id="hdr_logout" style="display:none;background:#ffffff33;border:1px solid #ffffff66;color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-weight:bold" onclick="doLogout()">🔒 Cerrar Sesión</button></header>
 <main id="v"></main>
@@ -98,21 +113,27 @@ pre{white-space:pre-wrap;font:13px/1.5 system-ui;margin:0 0 10px}
     <h2>Acceso Restringido</h2>
     <p id="lock_msg">Ingresa tu usuario y contraseña institucional para acceder al sistema:</p>
     <div id="lock_inputs">
-      <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">USUARIO / CORREO</small></div>
-      <input type="text" id="auth_user" placeholder="ej: jess.pirela@gmail.com" value="jess.pirela@gmail.com">
       <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">CONTRASEÑA</small></div>
-      <input type="password" id="auth_pass" placeholder="••••••••" onkeyup="if(event.key==='Enter')tryLogin()">
-      <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e;margin-top:6px" onclick="tryLogin()">INICIAR SESIÓN</button>
+      <input type="password" id="auth_pass" autocomplete="current-password" placeholder="••••••••••" onkeyup="if(event.key==='Enter')tryLogin()">
+      <input type="password" id="auth_pass2" autocomplete="new-password" placeholder="Repetir contraseña" style="display:none" onkeyup="if(event.key==='Enter')tryLogin()">
+      <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e;margin-top:6px" onclick="tryLogin()">DESBLOQUEAR</button>
     </div>
     <div id="lock_error" style="color:#f87171;font-size:12px;margin-top:10px;font-weight:bold;display:none">⚠️ Usuario o contraseña incorrectos.</div>
   </div>
 </div>
 
 <script src="xlsx.full.min.js"></script>
-<script>if(typeof XLSX==='undefined')document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"><\/script>')</script>
 <script>
 const $=s=>document.querySelector(s),H=(e,h)=>e.innerHTML=h;
-const save=()=>localStorage.setItem('sj',JSON.stringify(S));
+/* ---------- Puente nativo (seguro si no hay plugin) ---------- */
+const NP=()=>(window.Capacitor&&window.Capacitor.Plugins)||{};
+const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+const tap=()=>{try{NP().Haptics&&NP().Haptics.impact({style:'LIGHT'})}catch(e){}};
+document.addEventListener('click',e=>{if(e.target.closest('nav button,button.b,.r'))tap()},true);
+async function shareNative(title,text){try{if(NP().Share){await NP().Share.share({title,text,dialogTitle:title});return true}}catch(e){}return false}
+try{if(NP().StatusBar){NP().StatusBar.setStyle({style:'DARK'})}if(NP().SplashScreen){NP().SplashScreen.hide()}}catch(e){}
+let S=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ORG=['FANB','CPBEZ','Polimaracaibo','Polimara','Poliguajira','Polilagunillas','Policabimas','Polisur','Poliurdaneta','Policon','CICPC'];
 const orgMatch=(pOrg,o)=>{if(!pOrg||!o)return true;const po=pOrg.toLowerCase(),target=o.toLowerCase();
  if(target==='fanb')return po.includes('fanb')||po.includes('armada')||po.includes('ejército')||po.includes('ejercito')||po.includes('gnb');
@@ -129,69 +150,47 @@ const SAMPLE_OFFICERS=[
  {nombre:"GONZÁLEZ MENDOZA, MARÍA ELENA",ci:"V-20.114.832",fn:"1991-08-24",org:"CICPC",rango:"DETECTIVE JEFE",cred:"CICPC-99102",ofi:"DELEGACIÓN MUNICIPAL MARACAIBO",tel:"0424-6789012",mail:"mgonzalez@cicpc.gob.ve",siipol:"MGONZALEZ_SIIPOL",sangre:"A POSITIVO (A+)",arma:"PISTOLA TANFOGLIO FORCE 99 CAL 9MM N.º T84920",est:"ACTIVO",nota:"Coordinadora de enlace operativo SIIPOL."},
  {nombre:"FERNÁNDEZ SUÁREZ, JOSÉ LUIS",ci:"V-16.789.201",fn:"1985-11-30",org:"FANB",rango:"MAYOR (GNB)",cred:"GNB-33910",ofi:"COMANDO DE ZONA N.º 11 ZULIA",tel:"0412-5432109",mail:"jfernandez@gnb.mil.ve",siipol:"JFERNANDEZ_SIIPOL",sangre:"O NEGATIVO (O-)",arma:"PISTOLA BROWNING GP-35 CAL 9MM N.º B71209",est:"ACTIVO",vac:{d:today(),h:new Date(Date.now()+5*864e5).toISOString().slice(0,10)},nota:"Actualmente de vacaciones de servicio."}
 ];
-const DEF={p:SAMPLE_OFFICERS,snap:{},cfg:{url:'',last:0,user:'jess.pirela@gmail.com',pass:'SIIPOL.Pirela.saturno',firma:'Jefatura del Servicio SIIPOL, VEN 9-1-1 Zulia',
+const DEF={p:[],snap:{},cfg:{url:'',last:0,firma:'Jefatura del Servicio SIIPOL, VEN 9-1-1 Zulia',
  fechas:[{n:'Aniversario de la Armada',d:'07-24',o:'Armada'},{n:'Aniversario del Ejército (Batalla de Carabobo)',d:'06-24',o:'Ejército'},{n:'Aniversario de la GNB',d:'08-04',o:'GNB'},{n:'Día del Policía',d:'11-25',o:''}]}};
-let S=JSON.parse(localStorage.getItem('sj')||'null')||DEF;
-if(!S.p||S.p.length===0){S.p=SAMPLE_OFFICERS;save();}
-if(!S.cfg)S.cfg={};
-if(!S.cfg.user)S.cfg.user='jess.pirela@gmail.com';
-if(!S.cfg.pass)S.cfg.pass='SIIPOL.Pirela.saturno';
-
-/* ---------- Sistema de Seguridad / Autenticación ---------- */
-let isUnlocked=false;
-
-function checkAuth(){
- $('#lock_screen').style.display='flex';
- $('#hdr_logout').style.display='none';
- $('#lock_error').style.display='none';
- if(!$('#auth_user'))return;
- $('#auth_user').value=S.cfg.user||'jess.pirela@gmail.com';
- $('#auth_pass').value='';
- setTimeout(()=>$('#auth_pass')&&$('#auth_pass').focus(),300);
-}
-
-function tryLogin(){
- const u=($('#auth_user').value||'').trim().toLowerCase();
- const p=($('#auth_pass').value||'').trim();
- const targetUser=(S.cfg.user||'jess.pirela@gmail.com').toLowerCase();
- const targetPass=S.cfg.pass||'SIIPOL.Pirela.saturno';
-
- if(u===targetUser && p===targetPass){
-  unlockApp();
- }else{
-  $('#lock_error').style.display='block';
-  $('#auth_pass').value='';
-  $('#auth_pass').focus();
- }
-}
-
-function unlockApp(){
- isUnlocked=true;
- $('#lock_screen').style.display='none';
- $('#hdr_logout').style.display='block';
- go(cur||'ini');
-}
-
-function doLogout(){
- isUnlocked=false;
- checkAuth();
-}
-
-function updateCredentials(){
- const newU=$('#cfg_user').value.trim(), newP=$('#cfg_pass').value.trim();
- if(!newU||!newP){alert('Debes ingresar usuario y contraseña válidos.');return;}
- S.cfg.user=newU;
- S.cfg.pass=newP;
- save();
- alert('🔒 Credenciales de acceso actualizadas con éxito.');
- go('cfg');
-}
-
-document.addEventListener('visibilitychange',()=>{
- if(document.hidden && isUnlocked){
-  isUnlocked=false;
- }
-});
+/* ---------- Seguridad: cifrado local AES-256-GCM + bloqueo ---------- */
+let isUnlocked=false,KEY=null,SALT=null,WQ=Promise.resolve(),hiddenAt=0,idleT=null,busy=false;
+const TE=new TextEncoder(),TD=new TextDecoder();
+const b64=b=>{let s='';const u=new Uint8Array(b);for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)};
+const ub64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const derive=async(pw,salt)=>{const m=await crypto.subtle.importKey('raw',TE.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:310000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])};
+async function seal(k,s,d){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,TE.encode(d));localStorage.setItem('sj2',JSON.stringify({v:1,s:b64(s),i:b64(iv),c:b64(ct)}))}
+const save=()=>{if(!KEY||!S)return;const k=KEY,s=SALT,d=JSON.stringify(S);WQ=WQ.then(()=>seal(k,s,d)).catch(()=>alert('No se pudo guardar los datos cifrados.'))};
+function legacy(){try{const o=JSON.parse(localStorage.getItem('sj')||'null');if(o&&Array.isArray(o.p)){if(o.cfg){delete o.cfg.pass;delete o.cfg.user}return o}}catch(e){}return null}
+function normalize(){if(!Array.isArray(S.p))S.p=[];if(!S.snap)S.snap={};if(!S.cfg)S.cfg={};delete S.cfg.pass;delete S.cfg.user;
+ S.cfg.url=S.cfg.url||'';S.cfg.last=S.cfg.last||0;S.cfg.firma=S.cfg.firma||DEF.cfg.firma;S.cfg.fechas=S.cfg.fechas||DEF.cfg.fechas}
+const showErr=m=>{const e=$('#lock_error');e.textContent='⚠️ '+m;e.style.display='block'};
+function checkAuth(){const nuevo=!localStorage.getItem('sj2');
+ $('#lock_screen').style.display='flex';$('#hdr_logout').style.display='none';$('#lock_error').style.display='none';
+ $('#lock_msg').textContent=nuevo?'Primer uso: crea una contraseña (mínimo 10 caracteres). Cifrará todos los datos del equipo. Si la olvidas no se puede recuperar.':'Ingresa tu contraseña para acceder al sistema:';
+ $('#auth_pass2').style.display=nuevo?'block':'none';$('#auth_pass').value='';$('#auth_pass2').value='';
+ setTimeout(()=>$('#auth_pass').focus(),300)}
+async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem('sj_f')||'{"n":0,"t":0}');
+ if(Date.now()<f.t){showErr('Demasiados intentos. Espera '+Math.ceil((f.t-Date.now())/1000)+' s.');return}
+ const p=$('#auth_pass').value,raw=localStorage.getItem('sj2');busy=true;
+ try{
+  if(!raw){if(p.length<10||p!==$('#auth_pass2').value){showErr('Mínimo 10 caracteres y ambas contraseñas iguales.');return}
+   SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(p,SALT);S=legacy()||JSON.parse(JSON.stringify(DEF));normalize();
+   await seal(KEY,SALT,JSON.stringify(S));localStorage.removeItem('sj');unlockApp();return}
+  const o=JSON.parse(raw);SALT=ub64(o.s);KEY=await derive(p,SALT);
+  S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
+  localStorage.removeItem('sj_f');normalize();unlockApp()
+ }catch(e){KEY=null;S=null;const n=f.n+1;localStorage.setItem('sj_f',JSON.stringify({n,t:n>=3?Date.now()+Math.min(36e5,5e3*2**(n-2)):0}));showErr('Contraseña incorrecta.')}
+ finally{busy=false;$('#auth_pass').value=''}}
+function unlockApp(){isUnlocked=true;$('#lock_screen').style.display='none';$('#hdr_logout').style.display='block';$('#auth_pass').value='';$('#auth_pass2').value='';
+ go(cur||'ini');bump();if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync()}
+function lock(){KEY=null;S=null;window.O=null;isUnlocked=false;clearTimeout(idleT);['#v','#nav','#mb','#pr'].forEach(s=>H($(s),''));$('#md').classList.remove('on');checkAuth()}
+const doLogout=lock;
+const bump=()=>{clearTimeout(idleT);if(isUnlocked)idleT=setTimeout(lock,18e4)};
+['click','keydown','touchstart'].forEach(e=>addEventListener(e,bump,{passive:true}));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hiddenAt=Date.now();else if(isUnlocked&&Date.now()-hiddenAt>3e4)lock()});
+async function updateCredentials(){const p=$('#cfg_pass').value,p2=$('#cfg_pass2').value;
+ if(p.length<10||p!==p2){alert('Mínimo 10 caracteres y ambas contraseñas iguales.');return}
+ SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(p,SALT);await seal(KEY,SALT,JSON.stringify(S));alert('🔒 Contraseña actualizada.');go('cfg')}
 
 /* ---------- importación ---------- */
 const K=(o,keys)=>{
@@ -230,23 +229,23 @@ function ingest(rows){let n=0;rows.forEach(o=>{
  S.cfg.last=Date.now();snap();save();return n}
 function snap(){const k=today().slice(0,7),by={};S.p.forEach(p=>by[orgOf(p)]=(by[orgOf(p)]||0)+1);
  S.snap[k]={t:S.p.length,v:S.p.filter(p=>onVac(p)).length,by}}
-async function sync(manual){if(!S.cfg.url){if(manual)alert('Configura primero el enlace CSV de la hoja de Google.');return}
- try{const r=await fetch(S.cfg.url);const wb=XLSX.read(await r.text(),{type:'string',cellDates:true});
+async function sync(manual){if(!S)return;if(!S.cfg.url){if(manual)alert('Configura primero el enlace CSV de la hoja de Google.');return}
+ try{const u=new URL(S.cfg.url);if(u.protocol!=='https:'||u.hostname!=='docs.google.com')throw 0;const r=await fetch(u.href,{credentials:'omit',referrerPolicy:'no-referrer'});const tx=await r.text();if(tx.length>5e6)throw 0;const wb=XLSX.read(tx,{type:'string',cellDates:true});
  const n=ingest(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]));if(manual)alert(n+' registros sincronizados');go(cur)}
  catch(e){if(manual)alert('Sin conexión o enlace inválido. Se mantienen los datos guardados.')}}
-function loadFile(f){const r=new FileReader();r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+function loadFile(f){if(!f||!S)return;if(f.size>10e6){alert('Archivo demasiado grande (máx. 10 MB).');return}const r=new FileReader();r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
  alert(ingest(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]))+' registros importados');go('ini')};r.readAsArrayBuffer(f)}
 /* ---------- salida: PDF / WhatsApp / correo ---------- */
-function out(t,txt,mail=''){H($('#mb'),`<h2>${t}</h2><pre>${txt.replace(/</g,'&lt;')}</pre>
+function out(t,txt,mail=''){H($('#mb'),`<h2>${esc(t)}</h2><pre>${esc(txt)}</pre>
 <button class="b" onclick="pdf()">PDF / Imprimir</button>
 <button class="b s" onclick="wa()">WhatsApp</button>
 <button class="b s" onclick="ml()">Correo</button>
 <button class="b s" onclick="cp()">Copiar</button><button class="b s" onclick="$('#md').classList.remove('on')">Cerrar</button>`);
  window.O={t,txt,mail};$('#md').classList.add('on')}
-const pdf=()=>{H($('#pr'),`<h1>${O.t}</h1><pre>${O.txt.replace(/</g,'&lt;')}</pre><p>${S.cfg.firma}</p>`);print()};
-const wa=()=>open('https://wa.me/?text='+encodeURIComponent(O.t+'\n\n'+O.txt));
-const ml=()=>location.href=`mailto:${O.mail}?subject=${encodeURIComponent(O.t)}&body=${encodeURIComponent(O.txt+'\n\n'+S.cfg.firma)}`;
-const cp=()=>navigator.clipboard.writeText(O.txt);
+const pdf=async()=>{if(isNative()&&await shareNative(O.t,O.txt+'\n\n'+S.cfg.firma))return;H($('#pr'),`<h1>${esc(O.t)}</h1><pre>${esc(O.txt)}</pre><p>${esc(S.cfg.firma)}</p>`);print()};
+const wa=()=>{const u='https://wa.me/?text='+encodeURIComponent(O.t+'\n\n'+O.txt);isNative()?(location.href=u):open(u,'_blank','noopener')};
+const ml=()=>location.href=`mailto:${String(O.mail||'').replace(/[^\w.@,+-]/g,'')}?subject=${encodeURIComponent(O.t)}&body=${encodeURIComponent(O.txt+'\n\n'+S.cfg.firma)}`;
+const cp=()=>navigator.clipboard&&navigator.clipboard.writeText(O.txt).then(()=>alert('Copiado'),()=>{});
 function parte(d){const a=S.p.filter(p=>!onVac(p,d)),v=S.p.filter(p=>onVac(p,d));
  out('Parte del servicio SIIPOL · '+fmt(d),`Total: ${S.p.length} | Activos: ${a.length} | De vacaciones: ${v.length}\n\nDE VACACIONES:\n`+
  (v.map(p=>`- ${p.nombre} (${orgOf(p)}) regresa ${fmt(p.vac.h)}`).join('\n')||'Ninguno')+'\n\nPOR ORGANISMO:\n'+
@@ -256,7 +255,7 @@ const bd=(p)=>{if(!p.fn)return 999;const n=new Date(),[y,m,d]=p.fn.split('-').ma
  if(x<new Date(n.getFullYear(),n.getMonth(),n.getDate()))x=new Date(n.getFullYear()+1,m-1,d);return Math.round((x-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5)};
 const felic=p=>out('Felicitaciones por su cumpleaños',`Estimado(a) ${p.rango} ${p.nombre}:\n\nLa Jefatura del Servicio SIIPOL del VEN 9-1-1 Zulia le desea un feliz cumpleaños, junto con éxitos en su labor al servicio de la ciudadanía.\n\nFeliz día.`,p.mail);
 const felicOrg=(f)=>out(f.n,`Estimado personal:\n\nEn ocasión de ${f.n.toLowerCase()}, la Jefatura del Servicio SIIPOL del VEN 9-1-1 Zulia les extiende su reconocimiento por su compromiso y dedicación.\n\nFeliz día.`,
- S.p.filter(p=>!f.o||p.org.includes(f.o)).map(p=>p.mail).filter(Boolean).join(','));
+ S.p.filter(p=>!f.o||(p.org||'').includes(f.o)).map(p=>p.mail).filter(Boolean).join(','));
 /* ---------- jurídico y planillas ---------- */
 const LEY=[['Art. 1','El SIIPOL es de uso exclusivo del CICPC.'],['Art. 2','Solo el titular de la Dirección General Nacional del CICPC puede facilitar su información a organismos policiales que coadyuven en la investigación penal.'],['Art. 3','El titular de la Dirección General podrá autorizar mecanismos de intercambio de información con instituciones en materia científica, penal y criminalística.'],['Art. 4','El CICPC promoverá el fortalecimiento del centro de información estratégico, para regularizar el uso del sistema.'],['Art. 5','Dentro de 60 días hábiles se crearán protocolos y manuales internos de uso, control y supervisión; solo modificables por innovaciones tecnológicas.'],['Art. 6','Se harán supervisiones y auditorías permanentes del uso correcto del SIIPOL.'],['Art. 7','El funcionario del CICPC en comisión de servicio en otras instituciones no podrá usar el SIIPOL.'],['Art. 8','Los usuarios autorizados están sujetos a los protocolos internos de uso, control y supervisión.'],['Art. 9','El uso indebido o no autorizado acarrea sanciones administrativas, penales y civiles.'],['Art. 10','Vigencia desde su publicación en Gaceta Oficial.']];
 const PLAN={'Solicitud de usuario SIIPOL':'SOLICITUD DE USUARIO SIIPOL\n\nApellidos y nombres:\nC.I.:\nOrganismo:\nRango / Jerarquía:\nN.º de credencial:\nOficina de adscripción:\nCorreo:\nTeléfono:\n\nDeclaro conocer las normas de uso del SIIPOL.\n\nFirma: ____________   Fecha: ____/____/______',
@@ -269,8 +268,8 @@ function go(t){cur=t;H($('#nav'),TABS.map(x=>`<button class="${x[0]==t?'on':''}"
  if(t=='ini'){const v1=S.p.filter(p=>onVac(p)),ret=S.p.filter(p=>p.vac&&p.vac.h>=today()&&p.vac.h<=new Date(Date.now()+7*864e5).toISOString().slice(0,10)),b=S.p.filter(p=>bd(p)==0);
  H(v,`<h2>Resumen</h2><div class="k"><div><b>${S.p.length}</b><span>Funcionarios</span></div><div><b>${S.p.length-v1.length}</b><span>Activos</span></div><div><b>${v1.length}</b><span>De vacaciones</span></div><div><b>${b.length}</b><span>Cumplen hoy</span></div></div>
  ${S.p.length?'':'<div class="card">Aún no hay datos. Ve a <b>Ajustes</b> e importa tu Excel o enlaza la hoja de Google.</div>'}
- <div class="card"><h3>Regresan en 7 días</h3>${ret.map(p=>`<div class="r"><span>${p.nombre}<br><small>${orgOf(p)}</small></span><small>${fmt(p.vac.h)}</small></div>`).join('')||'<small>Nadie por ahora.</small>'}</div>
- <div class="card"><h3>Parte del servicio por fecha</h3><input type="date" id="pd" value="${today()}"><button class="b" onclick="parte($('#pd').value)">Generar parte</button></div>${b.length?`<div class="card"><h3>Cumpleaños de hoy</h3>${b.map(p=>`<div class="r" onclick="felic(S.p[${S.p.indexOf(p)}])"><span>${p.nombre}</span><span class="tag">Felicitar</span></div>`).join('')}</div>`:''}`)}
+ <div class="card"><h3>Regresan en 7 días</h3>${ret.map(p=>`<div class="r"><span>${esc(p.nombre)}<br><small>${esc(orgOf(p))}</small></span><small>${fmt(p.vac.h)}</small></div>`).join('')||'<small>Nadie por ahora.</small>'}</div>
+ <div class="card"><h3>Parte del servicio por fecha</h3><input type="date" id="pd" value="${today()}"><button class="b" onclick="parte($('#pd').value)">Generar parte</button></div>${b.length?`<div class="card"><h3>Cumpleaños de hoy</h3>${b.map(p=>`<div class="r" onclick="felic(S.p[${S.p.indexOf(p)}])"><span>${esc(p.nombre)}</span><span class="tag">Felicitar</span></div>`).join('')}</div>`:''}`)}
  if(t=='per'){H(v,`<h2>Personal</h2><input id="q" placeholder="Buscar nombre, cédula, credencial…" oninput="lst()"><select id="fo" onchange="lst()"><option value="">Todos los organismos</option>${ORG.map(o=>`<option>${o}</option>`).join('')}</select><div class="card" id="ls"></div>`);lst()}
  if(t=='est'){const mx=Math.max(1,...ORG.map(o=>S.p.filter(p=>orgMatch(p.org,o)).length)),ks=Object.keys(S.snap).sort(),a=S.snap[ks[ks.length-1]],b=S.snap[ks[ks.length-2]];
  H(v,`<h2>Estadísticas</h2><div class="card"><h3>Funcionarios por organismo</h3>${ORG.map(o=>{const n=S.p.filter(p=>orgMatch(p.org,o)).length,q=b?b.by[o]||0:0;
@@ -278,38 +277,31 @@ function go(t){cur=t;H($('#nav'),TABS.map(x=>`<button class="${x[0]==t?'on':''}"
  <div class="card"><h3>Comparación mensual</h3>${a?`Mes ${ks[ks.length-1]}: <b>${a.t}</b> funcionarios, <b>${a.v}</b> de vacaciones.<br>`:'Sin datos.'}${b?`Mes ${ks[ks.length-2]}: <b>${b.t}</b> funcionarios, <b>${b.v}</b> de vacaciones. Variación: <b>${a.t-b.t>=0?'+':''}${a.t-b.t}</b>`:'<small>La comparación aparece al cerrar el primer mes.</small>'}</div>
  <button class="b" onclick="out('Estadística SIIPOL',ORG.map(o=>o+': '+S.p.filter(p=>orgMatch(p.org,o)).length).join('\\n'))">Exportar / enviar</button>`)}
  if(t=='fec'){const l=S.p.filter(p=>p.fn).sort((a,b)=>bd(a)-bd(b)).slice(0,25);
- H(v,`<h2>Cumpleaños próximos</h2><div class="card">${l.map(p=>`<div class="r" onclick="felic(S.p[${S.p.indexOf(p)}])"><span>${p.nombre}<br><small>${orgOf(p)}</small></span><span><small>${fmt(p.fn).slice(0,5)}</small> <span class="tag">${bd(p)==0?'Hoy':'en '+bd(p)+' d'}</span></span></div>`).join('')||'<small>Sin fechas de nacimiento.</small>'}</div>
- <h2>Fechas institucionales</h2><div class="card">${S.cfg.fechas.map((f,i)=>`<div class="r" onclick="felicOrg(S.cfg.fechas[${i}])"><span>${f.n}<br><small>Verifica la fecha en Ajustes</small></span><span class="tag">${f.d.split('-').reverse().join('/')}</span></div>`).join('')}</div>
+ H(v,`<h2>Cumpleaños próximos</h2><div class="card">${l.map(p=>`<div class="r" onclick="felic(S.p[${S.p.indexOf(p)}])"><span>${esc(p.nombre)}<br><small>${esc(orgOf(p))}</small></span><span><small>${fmt(p.fn).slice(0,5)}</small> <span class="tag">${bd(p)==0?'Hoy':'en '+bd(p)+' d'}</span></span></div>`).join('')||'<small>Sin fechas de nacimiento.</small>'}</div>
+ <h2>Fechas institucionales</h2><div class="card">${S.cfg.fechas.map((f,i)=>`<div class="r" onclick="felicOrg(S.cfg.fechas[${i}])"><span>${esc(f.n)}<br><small>Verifica la fecha en Ajustes</small></span><span class="tag">${f.d.split('-').reverse().join('/')}</span></div>`).join('')}</div>
  <div class="card"><small>Al tocar, se prepara el mensaje institucional para enviarlo por correo o WhatsApp.</small></div>`)}
  if(t=='jur'){H(v,`<h2>Jurídico</h2><input id="jq" placeholder="Buscar en las normas…" oninput="jf()"><div class="card" id="jl"></div>
  <div class="card"><small>Resolución N.º 196 (27/05/2014), Gaceta Oficial N.º 40.422 del 29/05/2014.</small></div>
  <h2>Planillas</h2><div class="card">${Object.keys(PLAN).map(k=>`<div class="r" onclick="out('${k}',PLAN['${k}'])"><span>${k}</span><span class="tag">Abrir</span></div>`).join('')}</div>
- <h2>Notas jurídicas</h2><textarea id="jn" rows="4" placeholder="Tus criterios y precedentes…" onchange="S.cfg.nj=this.value;save()">${S.cfg.nj||''}</textarea>`);jf()}
+ <h2>Notas jurídicas</h2><textarea id="jn" rows="4" placeholder="Tus criterios y precedentes…" onchange="S.cfg.nj=this.value;save()">${esc(S.cfg.nj||'')}</textarea>`);jf()}
  if(t=='cfg'){H(v,`<h2>Ajustes</h2>
- <div class="card">
-   <h3>🔒 Credenciales y Control de Acceso (.env)</h3>
-   <div style="margin:8px 0">
-     <small style="color:var(--m)">Usuario / Correo Registrado</small>
-     <input id="cfg_user" value="${S.cfg.user||'jess.pirela@gmail.com'}">
-     <small style="color:var(--m)">Contraseña del Sistema</small>
-     <input type="password" id="cfg_pass" value="${S.cfg.pass||'SIIPOL.Pirela.saturno'}">
-     <button class="b" onclick="updateCredentials()">Guardar Cambios de Credenciales</button>
-   </div>
- </div>
+ <div class="card"><h3>🔒 Seguridad</h3><small style="color:var(--m)">Datos cifrados (AES-256) con tu contraseña. Se bloquea al salir de la app o tras 3 min sin uso.</small>
+ <input type="password" id="cfg_pass" autocomplete="new-password" placeholder="Nueva contraseña (mín. 10)"><input type="password" id="cfg_pass2" autocomplete="new-password" placeholder="Repetir nueva contraseña">
+ <button class="b" onclick="updateCredentials()">Cambiar contraseña</button><button class="b s" onclick="lock()">Bloquear ahora</button></div>
  <div class="card"><h3>Importar Excel / CSV</h3><input type="file" accept=".xlsx,.xls,.csv" onchange="loadFile(this.files[0])"></div>
- <div class="card"><h3>Datos de Prueba</h3><button class="b" onclick="S.p=JSON.parse(JSON.stringify(SAMPLE_OFFICERS));save();alert('Funcionarios de ejemplo cargados');go('per')">Cargar Funcionarios de Ejemplo</button>
+ <div class="card"><h3>Datos de Prueba</h3><button class="b" onclick="if(confirm('Esto reemplaza la lista actual por datos ficticios. ¿Continuar?')){S.p=JSON.parse(JSON.stringify(SAMPLE_OFFICERS));save();go('per')}">Cargar Funcionarios de Ejemplo</button>
  <button class="b s" onclick="if(confirm('¿Deseas borrar toda la lista de funcionarios?')){S.p=[];save();go('ini')}">Borrar Todo</button></div>
- <div class="card"><h3>Sincronización semanal</h3><small>En Google Sheets: Archivo → Compartir → Publicar en la web → CSV. Pega el enlace.</small><input id="u" value="${S.cfg.url}" placeholder="https://docs.google.com/…/pub?output=csv" onchange="S.cfg.url=this.value;save()">
+ <div class="card"><h3>Sincronización semanal</h3><small>En Google Sheets: Archivo → Compartir → Publicar en la web → CSV. Pega el enlace.</small><input id="u" value="${esc(S.cfg.url)}" placeholder="https://docs.google.com/…/pub?output=csv" onchange="S.cfg.url=this.value;save()">
  <button class="b" onclick="sync(true)">Sincronizar ahora</button><br><small>Última: ${S.cfg.last?new Date(S.cfg.last).toLocaleString():'nunca'}</small></div>
- <div class="card"><h3>Firma de mensajes</h3><input value="${S.cfg.firma}" onchange="S.cfg.firma=this.value;save()"></div>
- <div class="card"><h3>Respaldo</h3><button class="b s" onclick="out('Respaldo JSON',JSON.stringify(S))">Exportar datos</button></div>`)}}
+ <div class="card"><h3>Firma de mensajes</h3><input value="${esc(S.cfg.firma)}" onchange="S.cfg.firma=this.value;save()"></div>
+ <div class="card"><h3>Respaldo</h3><button class="b s" onclick="if(confirm('El respaldo contiene datos personales sensibles SIN cifrar. Guárdalo solo en un lugar seguro. ¿Continuar?'))out('Respaldo JSON',JSON.stringify(S))">Exportar datos</button></div>`)}}
 function lst(){const q=$('#q').value.toLowerCase(),o=$('#fo').value;
- H($('#ls'),S.p.map((p,i)=>[p,i]).filter(([p])=>(!o||orgMatch(p.org,o))&&(p.nombre+p.ci+p.cred).toLowerCase().includes(q)).slice(0,80).map(([p,i])=>`<div class="r" onclick="ficha(${i})"><span>${p.nombre}<br><small>${p.rango} · ${orgOf(p)}</small></span>${stat(p)}</div>`).join('')||'<small>Sin resultados.</small>')}
+ H($('#ls'),S.p.map((p,i)=>[p,i]).filter(([p])=>(!o||orgMatch(p.org,o))&&(p.nombre+p.ci+p.cred).toLowerCase().includes(q)).slice(0,80).map(([p,i])=>`<div class="r" onclick="ficha(${i})"><span>${esc(p.nombre)}<br><small>${esc(p.rango)} · ${esc(orgOf(p))}</small></span>${stat(p)}</div>`).join('')||'<small>Sin resultados.</small>')}
 const edad=f=>{if(!f)return'—';const n=new Date(),b=new Date(f);let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return a};
 const dos=p=>{
- const R=(l,v)=>`<div class="fr-box"><b>${l}</b><span>${v||'<i style="color:#94a3b8;font-weight:normal">Sin registrar</i>'}</span></div>`;
+ const R=(l,v,raw)=>`<div class="fr-box"><b>${l}</b><span>${v?(raw?v:esc(v)):'<i style="color:#94a3b8;font-weight:normal">Sin registrar</i>'}</span></div>`;
  const expNum=`EXP-${p.ci?p.ci.replace(/\D/g,''):'0000'}-${new Date().getFullYear()}`;
- const estTxt=onVac(p)?`DE VACACIONES (HASTA ${fmt(p.vac.h)})`:(p.est?p.est.toUpperCase():'ACTIVO / DISPONIBLE');
+ const estTxt=onVac(p)?`DE VACACIONES (HASTA ${fmt(p.vac.h)})`:(p.est?esc(p.est.toUpperCase()):'ACTIVO / DISPONIBLE');
  const estCls=onVac(p)?`color:#b91c1c;font-weight:bold;`:`color:#15803d;font-weight:bold;`;
  return `<div class="fd"><div class="pp"><svg class="clip" width="34" height="72" viewBox="0 0 34 72"><path d="M10 44V15a7 7 0 0 1 14 0v42a11 11 0 0 1-22 0V22" fill="none" stroke="#8b929c" stroke-width="3" stroke-linecap="round"/></svg>
 <small class="ld">FOLIO: <b>${expNum}</b> | ACTUALIZADO: ${S.cfg.last?fmt(new Date(S.cfg.last).toISOString().slice(0,10)):'—'}</small>
@@ -335,7 +327,7 @@ ${R('Rango / Jerarquía',p.rango)}
 ${R('N.º Credencial / Placa',p.cred)}
 ${R('Oficina / Adscripción',p.ofi)}
 ${R('Arma Asignada / Porte',p.arma)}
-${R('Estatus Operativo',`<span style="${estCls}">${estTxt}</span>`)}
+${R('Estatus Operativo',`<span style="${estCls}">${estTxt}</span>`,1)}
 </div>
 <div class="sec-title">III. SISTEMA Y CONTACTO OPERATIVO</div>
 <div class="grid-2">
@@ -346,15 +338,15 @@ ${R('Registro / Folio Interno',expNum)}
 </div>
 <div class="sec-title">IV. OBSERVACIONES Y NOTAS DE CAMPO</div>
 <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:12px;border-radius:4px;min-height:60px;font-family:'Courier New',monospace;font-size:13px;color:#1e293b">
-${p.nota||'<i style="color:#94a3b8">Sin observaciones registradas a la fecha. Usa la opción "Editar Datos" para agregar notas u observaciones.</i>'}
+${p.nota?esc(p.nota):'<i style="color:#94a3b8">Sin observaciones registradas a la fecha. Usa la opción "Editar Datos" para agregar notas u observaciones.</i>'}
 </div>
 <div class="barcode">
-<div><b>JEFATURA DE SERVICIO SIIPOL - VEN 9-1-1 ZULIA</b><br><small>Documento confidencial generado para uso estrictamente oficial.</small></div>
+<div><b>JEFATURA DE SERVICIO SIIPOL - VEN 9-1-1 ZULIA</b><br><small>Documento confidencial generado para uso strictly oficial.</small></div>
 <div style="text-align:right"><span style="font-family:monospace;font-weight:bold;letter-spacing:3px">||| | ||||| ||| |||| ||</span><br><small>${expNum}</small></div>
 </div>
 </div></div>`};
 const dtxt=p=>`FICHA DE PERSONAL - SIIPOL VEN 9-1-1\n-----------------------------------\nFuncionario: ${p.nombre}\nC.I.: ${p.ci}\nEdad: ${edad(p.fn)} (${fmt(p.fn)})\nSangre: ${p.sangre||'—'}\nOrganismo: ${orgOf(p)}\nRango: ${p.rango||'—'}\nCredencial: ${p.cred||'—'}\nAdscripción: ${p.ofi||'—'}\nArma Asignada: ${p.arma||'—'}\nTeléfono: ${p.tel||'—'}\nCorreo: ${p.mail||'—'}\nUsuario SIIPOL: ${p.siipol||'—'}\nEstatus: ${onVac(p)?'De vacaciones hasta '+fmt(p.vac.h):(p.est||'Activo')}\nNotas: ${p.nota||'—'}`;
-const dpdf=()=>{H($('#pr'),dos(S.p[PI]));print()};
+const dpdf=async()=>{if(isNative()&&await shareNative('Ficha '+S.p[PI].nombre,dtxt(S.p[PI])))return;H($('#pr'),dos(S.p[PI]));print()};
 const dsend=k=>{const p=S.p[PI];window.O={t:'Ficha '+p.nombre,txt:dtxt(p),mail:p.mail};k=='wa'?wa():ml()};
 let PI=0;
 function ficha(i){const p=S.p[i];PI=i;const c="$('#md').classList.remove('on')";
@@ -367,23 +359,23 @@ function ficha(i){const p=S.p[i];PI=i;const c="$('#md').classList.remove('on')";
 <details style="margin-top:12px;background:var(--c);padding:12px;border:1px solid var(--l);border-radius:8px">
   <summary style="cursor:pointer;font-weight:bold;color:var(--g)">✏️ Editar / Completar Datos / Vacaciones</summary>
   <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-    <div><small style="color:var(--m)">Cédula</small><input id="e_ci" value="${p.ci||''}"></div>
-    <div><small style="color:var(--m)">Rango</small><input id="e_rango" value="${p.rango||''}"></div>
-    <div><small style="color:var(--m)">Credencial / Placa</small><input id="e_cred" value="${p.cred||''}"></div>
-    <div><small style="color:var(--m)">Oficina / Adscripción</small><input id="e_ofi" value="${p.ofi||''}"></div>
-    <div><small style="color:var(--m)">Teléfono</small><input id="e_tel" value="${p.tel||''}"></div>
-    <div><small style="color:var(--m)">Correo</small><input id="e_mail" value="${p.mail||''}"></div>
-    <div><small style="color:var(--m)">Usuario SIIPOL</small><input id="e_siipol" value="${p.siipol||''}"></div>
-    <div><small style="color:var(--m)">Tipo de Sangre</small><input id="e_sangre" value="${p.sangre||''}"></div>
-    <div style="grid-column:span 2"><small style="color:var(--m)">Arma Asignada / Porte</small><input id="e_arma" value="${p.arma||''}"></div>
+    <div><small style="color:var(--m)">Cédula</small><input id="e_ci" value="${esc(p.ci||'')}"></div>
+    <div><small style="color:var(--m)">Rango</small><input id="e_rango" value="${esc(p.rango||'')}"></div>
+    <div><small style="color:var(--m)">Credencial / Placa</small><input id="e_cred" value="${esc(p.cred||'')}"></div>
+    <div><small style="color:var(--m)">Oficina / Adscripción</small><input id="e_ofi" value="${esc(p.ofi||'')}"></div>
+    <div><small style="color:var(--m)">Teléfono</small><input id="e_tel" value="${esc(p.tel||'')}"></div>
+    <div><small style="color:var(--m)">Correo</small><input id="e_mail" value="${esc(p.mail||'')}"></div>
+    <div><small style="color:var(--m)">Usuario SIIPOL</small><input id="e_siipol" value="${esc(p.siipol||'')}"></div>
+    <div><small style="color:var(--m)">Tipo de Sangre</small><input id="e_sangre" value="${esc(p.sangre||'')}"></div>
+    <div style="grid-column:span 2"><small style="color:var(--m)">Arma Asignada / Porte</small><input id="e_arma" value="${esc(p.arma||'')}"></div>
   </div>
   <hr style="margin:10px 0;border:0;border-top:1px solid var(--l)">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-    <div><small style="color:var(--m)">Vacaciones Desde</small><input type="date" id="vd" value="${p.vac?.d||''}"></div>
-    <div><small style="color:var(--m)">Vacaciones Hasta (regreso)</small><input type="date" id="vh" value="${p.vac?.h||''}"></div>
+    <div><small style="color:var(--m)">Vacaciones Desde</small><input type="date" id="vd" value="${esc(p.vac?.d||'')}"></div>
+    <div><small style="color:var(--m)">Vacaciones Hasta (regreso)</small><input type="date" id="vh" value="${esc(p.vac?.h||'')}"></div>
   </div>
   <small style="color:var(--m)">Notas u Observaciones</small>
-  <textarea id="nt" rows="2" placeholder="Notas">${p.nota||''}</textarea>
+  <textarea id="nt" rows="2" placeholder="Notas">${esc(p.nota||'')}</textarea>
   <div style="margin-top:8px;display:flex;gap:8px">
     <button class="b" onclick="saveFicha(${i})">Guardar Cambios</button>
     <button class="b s" onclick="delete S.p[${i}].vac;save();${c};go('per')">Quitar vacaciones</button>
@@ -403,5 +395,4 @@ addEventListener('online',()=>sync());
 
 /* Inicializar siempre pantalla de bloqueo / seguridad */
 checkAuth();
-if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync();
 </script></body></html>

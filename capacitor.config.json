@@ -1,5 +1,14 @@
 {
   "appId": "com.ven911zulia.siipol",
   "appName": "SIIPOL Jefatura",
-  "webDir": "www"
+  "webDir": "www",
+  "backgroundColor": "#4a0d19",
+  "server": { "androidScheme": "https", "cleartext": false },
+  "ios": { "contentInset": "never", "backgroundColor": "#4a0d19", "allowsLinkPreview": false },
+  "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false, "loggingBehavior": "none" },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 800, "backgroundColor": "#4a0d19", "showSpinner": false },
+    "StatusBar": { "style": "DARK", "overlaysWebView": true },
+    "Keyboard": { "resize": "body" }
+  }
 }

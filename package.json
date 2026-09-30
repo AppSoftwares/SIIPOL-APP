@@ -1,24 +1,26 @@
 {
   "name": "siipol-app",
   "version": "1.0.0",
-  "description": "",
-  "main": "xlsx.full.min.js",
+  "description": "SIIPOL Jefatura - VEN 9-1-1 Zulia",
+  "private": true,
   "scripts": {
     "dev": "serve www",
     "start": "serve www",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "sync": "cap sync"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "@capacitor/android": "^8.5.2",
     "@capacitor/cli": "^8.5.2",
     "@capacitor/core": "^8.5.2",
-    "@capacitor/ios": "^8.5.2"
+    "@capacitor/ios": "^8.5.2",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/share": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "serve": "^14.2.6"
   }
 }

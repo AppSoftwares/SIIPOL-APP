@@ -35,3 +35,13 @@ android/app/src/main/assets/capacitor.config.json
 # Archivos pesados / PDFs / Zips exportados
 *.zip
 *.pdf
+
+# Secretos y firmas
+*.jks
+*.keystore
+keystore.properties
+local.properties
+*.p12
+*.mobileprovision
+ios/
+build/

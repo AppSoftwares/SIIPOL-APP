@@ -1,101 +1,50 @@
-name: Build iOS IPA
+name: Build iOS IPA (sin firmar)
 
 on:
-  push:
-    branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-ios:
-    name: Build iOS (.ipa)
     runs-on: macos-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Add iOS Platform & Sync Capacitor
+          cache: npm
+      - run: npm install
+      - name: Generar iconos y splash
         run: |
-          if [ ! -d "ios" ]; then
-            npx cap add ios
-          fi
+          if [ -d assets ]; then npx capacitor-assets generate --ios || true; fi
+      - name: Preparar plataforma iOS
+        run: |
+          [ -d ios ] || npx cap add ios
           npx cap sync ios
-          if [ -d "ios/App" ]; then
-            cd ios/App
-            pod install || true
-            cd ../..
-          fi
-          echo "=== Contents of ios/App ==="
-          ls -la ios/App || true
-
-      - name: Build iOS Archive (xcodebuild)
+      - name: Ajustar Info.plist
         run: |
-          if [ -d "ios/App/App.xcworkspace" ]; then
-            echo "Building with App.xcworkspace"
-            xcodebuild -workspace ios/App/App.xcworkspace \
-                       -scheme App \
-                       -configuration Release \
-                       -sdk iphoneos \
-                       -archivePath build/App.xcarchive \
-                       CODE_SIGN_IDENTITY="" \
-                       CODE_SIGNING_REQUIRED=NO \
-                       CODE_SIGNING_ALLOWED=NO \
-                       archive
-          else
-            echo "Building with App.xcodeproj"
-            xcodebuild -project ios/App/App.xcodeproj \
-                       -scheme App \
-                       -configuration Release \
-                       -sdk iphoneos \
-                       -archivePath build/App.xcarchive \
-                       CODE_SIGN_IDENTITY="" \
-                       CODE_SIGNING_REQUIRED=NO \
-                       CODE_SIGNING_ALLOWED=NO \
-                       archive
-          fi
-
-      - name: Package .ipa File
+          P=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName SIIPOL" $P || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string SIIPOL" $P
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" $P || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" $P
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" $P
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" $P || true
+          /usr/libexec/PlistBuddy -c "Add :UIViewControllerBasedStatusBarAppearance bool true" $P || /usr/libexec/PlistBuddy -c "Set :UIViewControllerBasedStatusBarAppearance true" $P
+      - name: Compilar
+        run: |
+          cd ios/App
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -sdk iphoneos -archivePath ../../build/App.xcarchive \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive
+      - name: Empaquetar IPA
         run: |
           mkdir -p build/Payload
           cp -R build/App.xcarchive/Products/Applications/*.app build/Payload/
-          cd build
-          zip -r SIIPOL-Jefatura.ipa Payload
-
-      - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v4
+          cd build && zip -qr SIIPOL-Jefatura.ipa Payload
+      - uses: actions/upload-artifact@v4
         with:
           name: SIIPOL-Jefatura-iOS-IPA
           path: build/SIIPOL-Jefatura.ipa
-          retention-days: 30
-
-      - name: Publish to GitHub Releases
-        uses: softprops/action-gh-release@v2
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        with:
-          tag_name: v1.0.0
-          name: "SIIPOL Jefatura v1.0.0 (iOS .IPA)"
-          body: |
-            ### 🛡️ SIIPOL Jefatura · VEN 9-1-1 Zulia (iOS Release)
-
-            - **Archivo Ejecutable**: `SIIPOL-Jefatura.ipa`
-            - Incluye pantalla de bloqueo con PIN de seguridad.
-            - Compatible con Sideloadly, TrollStore, AltStore, Scarlet o instalación en iOS.
-          draft: false
-          prerelease: false
-          files: build/SIIPOL-Jefatura.ipa
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          retention-days: 7
