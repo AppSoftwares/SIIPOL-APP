@@ -87,6 +87,17 @@ nav{background:color-mix(in srgb,var(--c) 82%,transparent);-webkit-backdrop-filt
 .r:after{content:"\203A";color:var(--m);font-size:20px;align-self:center;margin-left:4px}
 .r .tag+*,.r:has(.tag):after{display:none}
 .card{border-radius:14px;box-shadow:none}
+
+/* ---------- Reconocer + VPN ---------- */
+nav{overflow-x:auto;-webkit-overflow-scrolling:touch}nav button{flex:1 0 auto;min-width:74px}
+.chips{display:flex;gap:6px;overflow-x:auto;margin:0 0 10px;padding-bottom:2px}
+.chips button{flex:none;border:1px solid var(--l);background:var(--c);color:var(--t);border-radius:20px;padding:8px 12px;font:inherit;font-size:13px}
+.chips button.on{background:var(--g);color:#fff;border-color:var(--g)}
+select[size]{padding:4px;height:auto}
+.carta{font:13px/1.5 "Times New Roman",Georgia,serif;color:#000;background:#fff;padding:20px 22px;border:1px solid var(--l);border-radius:6px;-webkit-user-select:text;user-select:text}
+.carta p{margin:0 0 10px;text-align:justify}.carta .rt{text-align:right}.carta .ct{text-align:center}
+.carta .ch{display:flex;justify-content:space-between;font-size:11px;margin-bottom:14px}
+@media print{#pr .carta{border:0;padding:16mm 18mm;font-size:12.5pt;line-height:1.45}}
 </style></head><body>
 <header><div><b>Jefatura del Servicio SIIPOL</b><small>VEN 9-1-1 · Estado Zulia</small></div><button id="hdr_logout" style="display:none;background:#ffffff33;border:1px solid #ffffff66;color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-weight:bold" onclick="doLogout()">🔒 Cerrar Sesión</button></header>
 <main id="v"></main>
@@ -161,7 +172,9 @@ const derive=async(pw,salt)=>{const m=await crypto.subtle.importKey('raw',TE.enc
 async function seal(k,s,d){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,TE.encode(d));localStorage.setItem('sj2',JSON.stringify({v:1,s:b64(s),i:b64(iv),c:b64(ct)}))}
 const save=()=>{if(!KEY||!S)return;const k=KEY,s=SALT,d=JSON.stringify(S);WQ=WQ.then(()=>seal(k,s,d)).catch(()=>alert('No se pudo guardar los datos cifrados.'))};
 function legacy(){try{const o=JSON.parse(localStorage.getItem('sj')||'null');if(o&&Array.isArray(o.p)){if(o.cfg){delete o.cfg.pass;delete o.cfg.user}return o}}catch(e){}return null}
-function normalize(){if(!Array.isArray(S.p))S.p=[];if(!S.snap)S.snap={};if(!S.cfg)S.cfg={};delete S.cfg.pass;delete S.cfg.user;
+const DEFREC={saludo:'Institucional, Patriótico, Revolucionario, Anti Imperialista, y profundamente Chavista',n:'Dr. JESÚS ENRIQUE PIRELA ESPEJO',c1:'INSPECTOR JEFE',c2:'JEFE DE LA OFICINA DE ENLACE C.I.C.P.C.',lema:'¡Policía Científica; Servidores de la Patria Para la Paz y la Vida..!',ini:'JEPE/sl',lugar:'Maracaibo',rif1:'RIF: G-20000001-5',rif2:'RIF: G-20001032-0',inst:{},
+ motivos:['Dispositivo Semana Santa Seguras 2026','Dispositivo Navidades Seguras 2026','Dispositivo Vacaciones Escolares Seguras 2026','Dispositivo Carnavales Seguros 2027']};
+function normalize(){if(!Array.isArray(S.p))S.p=[];S.cfg=S.cfg||{};S.cfg.rec={...DEFREC,...(S.cfg.rec||{})};if(!Array.isArray(S.rec))S.rec=[];S.vpn={ext:[],cic:[],icn:[],iex:[],upd:0,...(S.vpn||{})};if(!S.snap)S.snap={};if(!S.cfg)S.cfg={};delete S.cfg.pass;delete S.cfg.user;
  S.cfg.url=S.cfg.url||'';S.cfg.last=S.cfg.last||0;S.cfg.firma=S.cfg.firma||DEF.cfg.firma;S.cfg.fechas=S.cfg.fechas||DEF.cfg.fechas}
 const showErr=m=>{const e=$('#lock_error');e.textContent='⚠️ '+m;e.style.display='block'};
 function checkAuth(){const nuevo=!localStorage.getItem('sj2');
@@ -234,6 +247,7 @@ async function sync(manual){if(!S)return;if(!S.cfg.url){if(manual)alert('Configu
  const n=ingest(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]));if(manual)alert(n+' registros sincronizados');go(cur)}
  catch(e){if(manual)alert('Sin conexión o enlace inválido. Se mantienen los datos guardados.')}}
 function loadFile(f){if(!f||!S)return;if(f.size>10e6){alert('Archivo demasiado grande (máx. 10 MB).');return}const r=new FileReader();r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+ const nv=vpnIngest(wb);if(nv){alert(nv);go('vpn');return}
  alert(ingest(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]))+' registros importados');go('ini')};r.readAsArrayBuffer(f)}
 /* ---------- salida: PDF / WhatsApp / correo ---------- */
 function out(t,txt,mail=''){H($('#mb'),`<h2>${esc(t)}</h2><pre>${esc(txt)}</pre>
@@ -242,7 +256,7 @@ function out(t,txt,mail=''){H($('#mb'),`<h2>${esc(t)}</h2><pre>${esc(txt)}</pre>
 <button class="b s" onclick="ml()">Correo</button>
 <button class="b s" onclick="cp()">Copiar</button><button class="b s" onclick="$('#md').classList.remove('on')">Cerrar</button>`);
  window.O={t,txt,mail};$('#md').classList.add('on')}
-const pdf=async()=>{if(isNative()&&await shareNative(O.t,O.txt+'\n\n'+S.cfg.firma))return;H($('#pr'),`<h1>${esc(O.t)}</h1><pre>${esc(O.txt)}</pre><p>${esc(S.cfg.firma)}</p>`);print()};
+const pdf=async()=>{if(isNative()&&await shareNative(O.t,O.html?O.txt:O.txt+'\n\n'+S.cfg.firma))return;H($('#pr'),O.html||`<h1>${esc(O.t)}</h1><pre>${esc(O.txt)}</pre><p>${esc(S.cfg.firma)}</p>`);print()};
 const wa=()=>{const u='https://wa.me/?text='+encodeURIComponent(O.t+'\n\n'+O.txt);isNative()?(location.href=u):open(u,'_blank','noopener')};
 const ml=()=>location.href=`mailto:${String(O.mail||'').replace(/[^\w.@,+-]/g,'')}?subject=${encodeURIComponent(O.t)}&body=${encodeURIComponent(O.txt+'\n\n'+S.cfg.firma)}`;
 const cp=()=>navigator.clipboard&&navigator.clipboard.writeText(O.txt).then(()=>alert('Copiado'),()=>{});
@@ -262,9 +276,10 @@ const PLAN={'Solicitud de usuario SIIPOL':'SOLICITUD DE USUARIO SIIPOL\n\nApelli
 'Compromiso de confidencialidad':'COMPROMISO DE CONFIDENCIALIDAD\n\nYo, ______________, C.I. ______________, me comprometo a usar el SIIPOL solo para fines de investigación penal autorizados, y a no divulgar su información. Conozco que el uso indebido acarrea sanciones administrativas, penales y civiles (Art. 9, Res. N.º 196, Gaceta Oficial N.º 40.422).\n\nFirma: ____________   Fecha: ____/____/______',
 'Bienvenida a nuevo usuario':'Bienvenido(a) a la Sala SIIPOL del VEN 9-1-1 Zulia.\n\nPara su registro, envíe: nombre completo, cédula, organismo, credencial, rango, oficina, correo y teléfono, y complete el formulario de actualización de datos del personal.'};
 /* ---------- vistas ---------- */
-let cur='ini';const TABS=[['ini','Inicio'],['per','Personal'],['est','Estadísticas'],['fec','Fechas'],['jur','Jurídico'],['cfg','Ajustes']];
+let cur='ini';const TABS=[['ini','Inicio'],['per','Personal'],['rec','Reconocer'],['vpn','VPN'],['est','Estadísticas'],['fec','Fechas'],['jur','Jurídico'],['cfg','Ajustes']];
 const stat=p=>onVac(p)?`<span class="tag v">Vacaciones · regresa ${fmt(p.vac.h)}</span>`:'<span class="tag">Activo</span>';
 function go(t){cur=t;H($('#nav'),TABS.map(x=>`<button class="${x[0]==t?'on':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join(''));const v=$('#v');
+ if(t=='rec')return recView(v);if(t=='vpn')return vpnView(v);
  if(t=='ini'){const v1=S.p.filter(p=>onVac(p)),ret=S.p.filter(p=>p.vac&&p.vac.h>=today()&&p.vac.h<=new Date(Date.now()+7*864e5).toISOString().slice(0,10)),b=S.p.filter(p=>bd(p)==0);
  H(v,`<h2>Resumen</h2><div class="k"><div><b>${S.p.length}</b><span>Funcionarios</span></div><div><b>${S.p.length-v1.length}</b><span>Activos</span></div><div><b>${v1.length}</b><span>De vacaciones</span></div><div><b>${b.length}</b><span>Cumplen hoy</span></div></div>
  ${S.p.length?'':'<div class="card">Aún no hay datos. Ve a <b>Ajustes</b> e importa tu Excel o enlaza la hoja de Google.</div>'}
@@ -288,13 +303,128 @@ function go(t){cur=t;H($('#nav'),TABS.map(x=>`<button class="${x[0]==t?'on':''}"
  <div class="card"><h3>🔒 Seguridad</h3><small style="color:var(--m)">Datos cifrados (AES-256) con tu contraseña. Se bloquea al salir de la app o tras 3 min sin uso.</small>
  <input type="password" id="cfg_pass" autocomplete="new-password" placeholder="Nueva contraseña (mín. 10)"><input type="password" id="cfg_pass2" autocomplete="new-password" placeholder="Repetir nueva contraseña">
  <button class="b" onclick="updateCredentials()">Cambiar contraseña</button><button class="b s" onclick="lock()">Bloquear ahora</button></div>
- <div class="card"><h3>Importar Excel / CSV</h3><input type="file" accept=".xlsx,.xls,.csv" onchange="loadFile(this.files[0])"></div>
+ <div class="card"><h3>Importar Excel / CSV</h3><small style="color:var(--m)">Personal, o el Excel VPN (ZULIA.xlsx): se detecta solo.</small><input type="file" accept=".xlsx,.xls,.csv" onchange="loadFile(this.files[0])"></div>
+ ${recCfg()}
  <div class="card"><h3>Datos de Prueba</h3><button class="b" onclick="if(confirm('Esto reemplaza la lista actual por datos ficticios. ¿Continuar?')){S.p=JSON.parse(JSON.stringify(SAMPLE_OFFICERS));save();go('per')}">Cargar Funcionarios de Ejemplo</button>
  <button class="b s" onclick="if(confirm('¿Deseas borrar toda la lista de funcionarios?')){S.p=[];save();go('ini')}">Borrar Todo</button></div>
  <div class="card"><h3>Sincronización semanal</h3><small>En Google Sheets: Archivo → Compartir → Publicar en la web → CSV. Pega el enlace.</small><input id="u" value="${esc(S.cfg.url)}" placeholder="https://docs.google.com/…/pub?output=csv" onchange="S.cfg.url=this.value;save()">
  <button class="b" onclick="sync(true)">Sincronizar ahora</button><br><small>Última: ${S.cfg.last?new Date(S.cfg.last).toLocaleString():'nunca'}</small></div>
  <div class="card"><h3>Firma de mensajes</h3><input value="${esc(S.cfg.firma)}" onchange="S.cfg.firma=this.value;save()"></div>
  <div class="card"><h3>Respaldo</h3><button class="b s" onclick="if(confirm('El respaldo contiene datos personales sensibles SIN cifrar. Guárdalo solo en un lugar seguro. ¿Continuar?'))out('Respaldo JSON',JSON.stringify(S))">Exportar datos</button></div>`)}}
+/* ================= RECONOCIMIENTOS ================= */
+const nz=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const DS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],MS=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const fechaL=iso=>{const [y,m,d]=(iso||today()).split('-').map(Number),x=new Date(y,m-1,d);return `${DS[x.getDay()]} ${String(d).padStart(2,'0')} de ${MS[m-1]} de ${y}`};
+const flip=n=>{n=String(n||'');const i=n.indexOf(',');return i<0?n.trim():(n.slice(i+1).trim()+' '+n.slice(0,i).trim())};
+const deArt=s=>{s=String(s||'').trim();if(!s)return 'de nuestra Institución';const w=nz(s).split(' ')[0];
+ if(/^(instituto|cuerpo|centro|comando|destacamento|servicio|ministerio|departamento|batallon|regimiento|grupo|ejercito|equipo)$/.test(w))return 'del '+s;
+ if(/^(policia|direccion|guardia|delegacion|oficina|armada|brigada|coordinacion|division|unidad|zona|region|fuerza|institucion|compania|subdelegacion|inspectoria|aviacion|milicia|sala|jefatura)$/.test(w))return 'de la '+s;return 'de '+s};
+const durante=m=>{m=String(m||'').trim();const w=nz(m).split(' ')[0];
+ if(/^(dispositivo|operativo|plan|servicio|despliegue|proceso|trabajo)$/.test(w))return 'el '+m;
+ if(/^(jornada|campana|mision|operacion|actividad|gestion|labor|temporada|epoca)$/.test(w))return 'la '+m;return m};
+const RT={dis:['Reconocimiento por dispositivo / operativo','Felicita su desempeño durante el dispositivo o actividad elegida.','RECONOCIMIENTO'],
+ nav:['Motivación: Navidad y fin de año','Agradece el año de trabajo y lo anima a seguir avanzando.','FELICITACIONES Y MOTIVACIÓN'],
+ ava:['Estímulo para seguir avanzando','Reconoce su desempeño y lo motiva a superarse y capacitarse.','ESTÍMULO Y RECONOCIMIENTO'],
+ ani:['Aniversario / fecha especial','Felicitación con motivo de una fecha o aniversario.','FELICITACIONES'],
+ lib:['Mensaje libre (solo tu texto)','Usa únicamente el texto que escribas en la nota.','RECONOCIMIENTO']};
+let RC={i:-1,t:'dis'};
+function recView(v){const cf=S.cfg.rec,M=cf.motivos;
+ H(v,`<h2>Reconocimientos y felicitaciones</h2>
+ <div class="card"><h3>1. Funcionario</h3><input id="rq" placeholder="Buscar por nombre o cédula…" oninput="recList()"><select id="rs" size="5" onchange="recPick(this.value)"></select><div id="rsel" style="margin-top:6px"><small>Ninguno seleccionado.</small></div></div>
+ <div class="card"><h3>2. Tipo de mensaje</h3><select id="rt" onchange="RC.t=this.value;recHint()">${Object.keys(RT).map(k=>`<option value="${k}"${k==RC.t?' selected':''}>${esc(RT[k][0])}</option>`).join('')}</select><small id="rh" style="color:var(--m)"></small></div>
+ <div class="card"><h3>3. ¿Por qué lo felicitas?</h3><select id="rm" onchange="$('#rmo').style.display=this.value==='__o'?'block':'none'">${M.map(m=>`<option>${esc(m)}</option>`).join('')}<option value="__o">Otro (escribir)…</option></select><input id="rmo" placeholder="Ej: Operativo Zulia Segura 2026" style="display:none"></div>
+ <div class="card"><h3>4. Detalles</h3>
+  <small style="color:var(--m)">Título / grado (opcional)</small><input id="rti" placeholder="LCDO., TSU., ING., ABG.…">
+  <small style="color:var(--m)">Institución del funcionario (como saldrá en la carta)</small><input id="rin" placeholder="Ej: Instituto Autónomo de Policía del Municipio …">
+  <small style="color:var(--m)">Fecha de la carta</small><input type="date" id="rf" value="${today()}">
+  <small style="color:var(--m)">Nota personal (opcional, se añade a la carta)</small><textarea id="rx" rows="2" placeholder="Ej: Destacó por su puntualidad en el turno nocturno."></textarea></div>
+ <button class="b" style="width:100%;padding:13px;font-weight:bold" onclick="recGen()">Generar carta</button>
+ <div class="card" style="margin-top:12px"><h3>Últimas cartas generadas</h3>${S.rec.slice(0,8).map(r=>`<div class="r" style="cursor:default"><span>${esc(r.n)}<br><small>${esc(r.m)}</small></span><small>${fmt(r.d)}</small></div>`).join('')||'<small>Aún no has generado ninguna.</small>'}</div>`);
+ recList();recHint();if(RC.i>=0&&S.p[RC.i])recPick(RC.i)}
+function recList(){const q=nz($('#rq').value);
+ H($('#rs'),S.p.map((p,i)=>[p,i]).filter(([p])=>nz(p.nombre+' '+p.ci).includes(q)).slice(0,60).map(([p,i])=>`<option value="${i}"${i==RC.i?' selected':''}>${esc(p.nombre)}</option>`).join('')||'<option disabled>Sin resultados (importa tu personal en Ajustes)</option>')}
+function recPick(i){i=+i;const p=S.p[i];if(!p)return;RC.i=i;
+ H($('#rsel'),`<b>${esc(p.nombre)}</b><br><small>${esc(p.rango||'—')} · ${esc(orgOf(p))} · ${esc(p.ci||'sin cédula')}</small>`);
+ $('#rin').value=(S.cfg.rec.inst[p.org||'']||'')}
+function recHint(){$('#rh').textContent=RT[RC.t][1]}
+function recParas(t,mot,inst,sal,extra){const A=deArt(inst);
+ const sd=`Me dirijo a Usted, en la oportunidad de expresarle un cordial y diferente saludo ${sal}, extensivo a toda su familia; y a su vez `;
+ const P2=`Por tal motivo considero propio manifestarle la satisfacción que me produce el hecho de contar con su apoyo, su espíritu de trabajo y abnegación, compañerismo, lealtad y cooperación. Que lo hacen un profesional con excelentes virtudes, que dejan en alto el nombre ${A}.`;
+ const P3=`Reciba estas palabras de felicitaciones, en nombre de quienes integramos esta Oficina de Enlace y Coordinación Regional de S.I.I.POL en el VEN 9-1-1 Zulia, que la misma sirva de estímulo para que continúe trabajando con el mismo empeño y dedicación.`;
+ const P4=`Reconocimiento que hago a los fines administrativos consiguientes, y para el conocimiento de la Superioridad.`;
+ let a=[];
+ if(t=='dis')a=[sd+`tiene la finalidad de expresarle mis más sinceras palabras de “FELICITACIONES”, por su extraordinaria labor y excelente desempeño puesto en manifiesto en el cumplimiento de sus funciones, durante ${durante(mot)}, que inciden en un mejor desarrollo de todas las actividades que se llevan a efecto en esta Institución.`,P2,P3];
+ if(t=='nav')a=[`Me dirijo a Usted, en la oportunidad de expresarle un cordial saludo ${sal}, extensivo a toda su familia, en esta época de Navidad y fin de año; y a su vez expresarle mis más sinceras palabras de “FELICITACIONES” y de profundo agradecimiento por su entrega, disciplina y compromiso demostrados durante ${durante(mot)}, que contribuyen a la seguridad y tranquilidad de la ciudadanía zuliana.`,
+  `Su espíritu de trabajo, compañerismo, lealtad y cooperación lo hacen un profesional ejemplar, que deja en alto el nombre ${A}. Es gracias a funcionarios como usted que esta Oficina de Enlace y Coordinación Regional de S.I.I.POL en el VEN 9-1-1 Zulia cumple su misión con eficiencia.`,
+  `Que estas fiestas le llenen de paz, salud y unión junto a los suyos, y que el nuevo año nos encuentre más fortalecidos. Lo invito a seguir avanzando, con la misma fe, empeño y vocación de servicio, porque lo mejor está por venir y cada logro suyo es también un logro de todo nuestro equipo.`];
+ if(t=='ava')a=[sd+`expresarle mis más sinceras palabras de “FELICITACIONES” por su destacado desempeño durante ${durante(mot)}, el cual refleja su compromiso con el servicio y su constante superación.`,
+  `Su trayectoria demuestra que el esfuerzo sostenido, la disciplina y la responsabilidad rinden frutos. Lo exhorto a seguir avanzando: a capacitarse, a mantener la excelencia en cada tarea y a ser ejemplo para sus compañeros, dejando en alto el nombre ${A}.`,P3];
+ if(t=='ani')a=[sd+`expresarle mis más sinceras palabras de “FELICITACIONES” con motivo de ${mot}, y reconocer su dedicación y entrega en el cumplimiento de sus funciones.`,P2,P3];
+ if(t=='lib')return extra?[extra]:[];
+ if(extra)a.push(extra);a.push(P4);return a}
+function recGen(){if(RC.i<0||!S.p[RC.i]){alert('Primero selecciona un funcionario.');return}
+ const p=S.p[RC.i],cf=S.cfg.rec;let mot=$('#rm').value;if(mot==='__o')mot=$('#rmo').value.trim();
+ if(!mot&&RC.t!='lib'){alert('Indica el motivo de la felicitación.');return}
+ const inst=$('#rin').value.trim(),ex=$('#rx').value.trim(),ti=$('#rti').value.trim(),fe=$('#rf').value||today();
+ if(RC.t=='lib'&&!ex){alert('Escribe tu texto en la nota personal.');return}
+ if(inst&&p.org){cf.inst[p.org]=inst}
+ const paras=recParas(RC.t,mot,inst,cf.saludo,ex),nom=(ti?ti+' ':'')+flip(p.nombre).toUpperCase(),ci=p.ci?(/^[VE]-/i.test(p.ci)?p.ci:'V- '+p.ci):'—',asu=RT[RC.t][2];
+ const txt=`${cf.lugar}, ${fechaL(fe)}\n\nCiudadano:\n${nom}\n${(p.rango||'').toUpperCase()}\nCÉDULA DE IDENTIDAD: ${ci}\n\nAsunto: ${asu}\n\n${paras.join('\n\n')}\n\nAtentamente\n\n${cf.n}\n${cf.c1}\n${cf.c2}\n${cf.lema}\nDIOS CON NOSOTROS\n${cf.ini}`;
+ const html=`<div class="carta"><div class="ch"><span>${esc(cf.rif1)}</span><span>${esc(cf.rif2)}</span></div><p class="rt">${esc(cf.lugar)}, ${esc(fechaL(fe))}</p><p><b>Ciudadano:</b></p><p><b>${esc(nom)}<br>${esc((p.rango||'').toUpperCase())}<br>CÉDULA DE IDENTIDAD: ${esc(ci)}</b></p><p class="rt">Asunto: ${esc(asu)}</p>${paras.map(x=>`<p>${esc(x)}</p>`).join('')}<p class="ct">Atentamente</p><p class="ct" style="margin-top:34px"><b>${esc(cf.n)}</b><br>${esc(cf.c1)}<br>${esc(cf.c2)}</p><p class="ct">${esc(cf.lema)}<br><b>DIOS CON NOSOTROS</b></p><small>${esc(cf.ini)}</small></div>`;
+ S.rec.unshift({d:fe,n:flip(p.nombre),m:RC.t=='lib'?'Mensaje libre':mot});S.rec=S.rec.slice(0,50);save();
+ window.O={t:'Reconocimiento '+flip(p.nombre),txt,mail:p.mail,html};
+ H($('#mb'),html+`<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap"><button class="b" onclick="pdf()">PDF / Imprimir</button><button class="b s" onclick="wa()">WhatsApp</button><button class="b s" onclick="ml()">Correo</button><button class="b s" onclick="cp()">Copiar</button><button class="b s" onclick="$('#md').classList.remove('on')">Cerrar</button></div>`);
+ $('#md').classList.add('on')}
+function setRec(k,v){S.cfg.rec[k]=v;save()}
+function setMotivos(v){S.cfg.rec.motivos=v.split(/\n/).map(s=>s.trim()).filter(Boolean);save()}
+function recCfg(){const c=S.cfg.rec,f=(k,l)=>`<small style="color:var(--m)">${l}</small><input value="${esc(c[k])}" onchange="setRec('${k}',this.value)">`;
+ return `<div class="card"><h3>✉️ Cartas de reconocimiento</h3><small style="color:var(--m)">Motivos disponibles (uno por línea)</small>
+ <textarea rows="5" onchange="setMotivos(this.value)">${esc(c.motivos.join('\n'))}</textarea>${f('saludo','Saludo institucional')}${f('lugar','Ciudad')}${f('rif1','Encabezado izquierdo')}${f('rif2','Encabezado derecho')}
+ ${f('n','Firmante (nombre)')}${f('c1','Cargo (línea 1)')}${f('c2','Cargo (línea 2)')}${f('lema','Lema')}${f('ini','Iniciales')}</div>`}
+
+/* ================= VPN / INTERCONEXION ================= */
+let VT='ext';
+const X=(o,k)=>{const kk=Object.keys(o).find(x=>nz(x)===nz(k));return kk==null||o[kk]==null?'':String(o[kk]).trim()};
+function vpnIngest(wb){const f=k=>wb.SheetNames.find(n=>nz(n).includes(k));
+ const a=f('usuarios externos'),b=f('usuarios cicpc'),c=f('interconexion cicpc'),d=f('interconexion externos');if(!a&&!b&&!c&&!d)return '';
+ const J=(n,o)=>XLSX.utils.sheet_to_json(wb.Sheets[n],{defval:'',...o}),V=S.vpn;
+ if(a)V.ext=J(a).map(o=>({u:X(o,'USUARIO'),h:X(o,'HABILITADO'),d:X(o,'DESPACHO'),ci:X(o,'CEDULA'),n:X(o,'NOMBRES'),a:X(o,'APELLIDOS'),e:X(o,'ESTADO GEOGRAFICO'),r:X(o,'REDIP')})).filter(x=>x.u||x.ci||x.n||x.a);
+ if(b)V.cic=J(b).map(o=>({p:X(o,'PERFIL USUARIO'),r:X(o,'RANGO FUNCIONARIO'),d:X(o,'DEPENDENCIA ADSCRITO'),e:X(o,'ESTADO GEOGRAFICO'),u:X(o,'USUARIO'),ci:X(o,'CEDULA'),n:(X(o,'NOMBRES')+' '+X(o,'APELLIDOS')).trim()})).filter(x=>x.p||x.d||x.u);
+ const ic=n=>J(n,{range:2}).map(o=>({d:X(o,'Despacho'),c:X(o,'Persona Contacto'),t:X(o,'Telefono'),i:X(o,'Interconexiones'),e:X(o,'ESTADO GEOGRAFICO'),r:X(o,'REDIP')})).filter(x=>x.d||x.c);
+ if(c)V.icn=ic(c);if(d)V.iex=ic(d);V.upd=Date.now();save();
+ return `VPN importado:\nUsuarios externos: ${V.ext.length}\nUsuarios CICPC: ${V.cic.length}\nInterconexión CICPC: ${V.icn.length}\nInterconexión externos: ${V.iex.length}`}
+const VTABS=[['ext','Usuarios Externos'],['cic','Usuarios CICPC'],['icn','Interconexión CICPC'],['iex','Interconexión Externos']];
+function vpnView(v){const V=S.vpn,n=V.ext.length+V.cic.length+V.icn.length+V.iex.length;
+ H(v,`<h2>VPN / Interconexión</h2><div class="chips">${VTABS.map(x=>`<button class="${x[0]==VT?'on':''}" onclick="VT='${x[0]}';vpnView($('#v'))">${x[1]} · ${V[x[0]].length}</button>`).join('')}</div>
+ ${n?'':'<div class="card"><b>Aún no hay datos VPN.</b><br><small>Importa tu ZULIA.xlsx (las 4 pestañas se cargan solas):</small><input type="file" accept=".xlsx,.xls" onchange="loadFile(this.files[0])"></div>'}<div id="vb"></div>
+ ${n?`<small style="color:var(--m)">Actualizado: ${V.upd?new Date(V.upd).toLocaleString():'—'} · para actualizar, importa de nuevo el Excel en Ajustes.</small>`:''}`);vpnBody()}
+function vpnBody(){const V=S.vpn,L=V[VT],vb=$('#vb');if(!L.length){H(vb,'');return}
+ if(VT=='ext'){const hab=L.filter(x=>nz(x.h)=='habilitado').length;
+  H(vb,`<div class="k"><div><b>${L.length}</b><span>Usuarios</span></div><div><b>${hab}</b><span>Habilitados</span></div><div><b>${L.length-hab}</b><span>Inhabilitados</span></div></div><div style="height:8px"></div>
+  <input id="vq" placeholder="Buscar nombre, cédula, usuario, despacho…" oninput="vpnList()"><select id="vf" onchange="vpnList()"><option value="">Todos</option><option value="habilitado">Habilitados</option><option value="inhabilitado">Inhabilitados</option></select><div class="card" id="vl"></div>`)}
+ else if(VT=='cic'){const cnt=k=>{const m={};L.forEach(x=>{const y=x[k]||'Sin dato';m[y]=(m[y]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])};
+  const pf=cnt('p'),dp=cnt('d'),mx=pf[0][1];
+  H(vb,`<div class="k"><div><b>${L.length}</b><span>Usuarios</span></div><div><b>${dp.length}</b><span>Dependencias</span></div><div><b>${pf.length}</b><span>Perfiles</span></div></div>
+  <div class="card" style="margin-top:8px"><h3>Por perfil de usuario</h3>${pf.slice(0,8).map(([k,n])=>`<div class="bar"><span style="width:130px;font-size:11px">${esc(k)}</span><i style="width:${n/mx*45}%"></i><b>${n}</b></div>`).join('')}</div>
+  <input id="vq" placeholder="Buscar perfil, rango, dependencia…" oninput="vpnList()"><select id="vf" onchange="vpnList()"><option value="">Todas las dependencias</option>${dp.map(([k])=>`<option>${esc(k)}</option>`).join('')}</select><div class="card" id="vl"></div>`)}
+ else H(vb,`<div class="k"><div><b>${L.length}</b><span>Contactos</span></div><div><b>${L.filter(x=>nz(x.i)=='vpn').length}</b><span>VPN</span></div><div><b>${L.filter(x=>nz(x.i)!='vpn').length}</b><span>Enlace de datos</span></div></div><div style="height:8px"></div>
+  <input id="vq" placeholder="Buscar despacho, contacto, teléfono…" oninput="vpnList()"><select id="vf" onchange="vpnList()"><option value="">Todos los tipos</option><option value="vpn">VPN</option><option value="otro">Enlace de datos / otros</option></select><div class="card" id="vl"></div>`);
+ vpnList()}
+function vpnList(){const L=S.vpn[VT],q=nz($('#vq').value),f=$('#vf').value,vl=$('#vl');let h='';
+ if(VT=='ext'){const r=L.map((x,i)=>[x,i]).filter(([x])=>(!f||nz(x.h)==f)&&nz(Object.values(x).join(' ')).includes(q));
+  h=r.slice(0,80).map(([x,i])=>`<div class="r" onclick="vpnDet(${i})"><span>${esc((x.n+' '+x.a).trim()||x.u)}<br><small>${esc(x.u)} · ${esc(x.ci)} · ${esc(x.d)}</small></span><span class="tag${nz(x.h)=='habilitado'?'':' v'}">${esc(x.h||'—')}</span></div>`).join('')+(r.length>80?`<small>Mostrando 80 de ${r.length}. Afina la búsqueda.</small>`:'')}
+ else if(VT=='cic'){const g={};L.filter(x=>(!f||x.d==f)&&nz([x.p,x.r,x.d,x.u,x.n,x.ci].join(' ')).includes(q)).forEach(x=>{const k=[x.d,x.p,x.r].join('|');g[k]=g[k]||{x,n:0};g[k].n++});
+  const r=Object.values(g).sort((a,b)=>b.n-a.n),tot=r.reduce((s,y)=>s+y.n,0);
+  h=`<small>${tot} usuarios en ${r.length} grupos</small>`+r.slice(0,80).map(y=>`<div class="r" style="cursor:default"><span>${esc(y.x.p||'Sin perfil')}<br><small>${esc(y.x.r)} · ${esc(y.x.d)}</small></span><span class="tag">${y.n}</span></div>`).join('')}
+ else{const r=L.map((x,i)=>[x,i]).filter(([x])=>(!f||(f=='vpn')==(nz(x.i)=='vpn'))&&nz(Object.values(x).join(' ')).includes(q));
+  h=r.slice(0,80).map(([x,i])=>`<div class="r" onclick="vpnDet(${i})"><span>${esc(x.d)}<br><small>${esc(x.c||'Sin contacto')}${x.t?' · '+esc(x.t):''}</small></span><span class="tag${nz(x.i)=='vpn'?'':' v'}">${esc(x.i||'—')}</span></div>`).join('')+(r.length>80?`<small>Mostrando 80 de ${r.length}. Afina la búsqueda.</small>`:'')}
+ H(vl,h||'<small>Sin resultados.</small>')}
+function vpnDet(i){const x=S.vpn[VT][i];if(!x)return;const R=(l,v)=>v?`<div class="r" style="cursor:default"><small>${l}</small><b style="text-align:right">${esc(v)}</b></div>`:'';let body,tel='',nm='';
+ if(VT=='ext'){nm=(x.n+' '+x.a).trim();body=R('Funcionario',nm)+R('Usuario',x.u)+R('Cédula',x.ci)+R('Estatus',x.h)+R('Despacho',x.d)+R('Estado',x.e)+R('REDIP',x.r)}
+ else{tel=String(x.t||'').replace(/[^\d]/g,'');nm=x.c;body=R('Despacho',x.d)+R('Contacto',x.c)+R('Teléfono',x.t)+R('Interconexión',x.i)+R('Estado',x.e)+R('REDIP',x.r)}
+ const wa58=tel?(tel.startsWith('0')?'58'+tel.slice(1):tel):'';
+ window.O={t:'Contacto '+(x.d||nm),txt:[x.d,x.c,x.t,x.i].filter(Boolean).join('\n'),mail:''};
+ H($('#mb'),`<h2>${esc(x.d||nm)}</h2><div class="card">${body}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${tel?`<button class="b" onclick="location.href='tel:+${wa58}'">Llamar</button><button class="b s" onclick="location.href='https://wa.me/${wa58}'">WhatsApp</button>`:''}<button class="b s" onclick="cp()">Copiar</button><button class="b s" onclick="$('#md').classList.remove('on')">Cerrar</button></div>`);$('#md').classList.add('on')}
 function lst(){const q=$('#q').value.toLowerCase(),o=$('#fo').value;
  H($('#ls'),S.p.map((p,i)=>[p,i]).filter(([p])=>(!o||orgMatch(p.org,o))&&(p.nombre+p.ci+p.cred).toLowerCase().includes(q)).slice(0,80).map(([p,i])=>`<div class="r" onclick="ficha(${i})"><span>${esc(p.nombre)}<br><small>${esc(p.rango)} · ${esc(orgOf(p))}</small></span>${stat(p)}</div>`).join('')||'<small>Sin resultados.</small>')}
 const edad=f=>{if(!f)return'—';const n=new Date(),b=new Date(f);let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return a};
@@ -341,7 +471,7 @@ ${R('Registro / Folio Interno',expNum)}
 ${p.nota?esc(p.nota):'<i style="color:#94a3b8">Sin observaciones registradas a la fecha. Usa la opción "Editar Datos" para agregar notas u observaciones.</i>'}
 </div>
 <div class="barcode">
-<div><b>JEFATURA DE SERVICIO SIIPOL - VEN 9-1-1 ZULIA</b><br><small>Documento confidencial generado para uso strictly oficial.</small></div>
+<div><b>JEFATURA DE SERVICIO SIIPOL - VEN 9-1-1 ZULIA</b><br><small>Documento confidencial generado para uso estrictamente oficial.</small></div>
 <div style="text-align:right"><span style="font-family:monospace;font-weight:bold;letter-spacing:3px">||| | ||||| ||| |||| ||</span><br><small>${expNum}</small></div>
 </div>
 </div></div>`};

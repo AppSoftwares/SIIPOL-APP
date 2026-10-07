@@ -45,3 +45,6 @@ local.properties
 *.mobileprovision
 ios/
 build/
+*.xlsx
+*.xls
+*.csv
