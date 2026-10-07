@@ -127,7 +127,10 @@ select[size]{padding:4px;height:auto}
       <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">USUARIO</small></div>
       <input type="text" id="auth_user" autocomplete="username" placeholder="jess.pirela@gmail.com" value="">
       <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">CONTRASEÑA</small></div>
-      <input type="password" id="auth_pass" autocomplete="current-password" placeholder="••••••••••" value="" onkeyup="if(event.key==='Enter')tryLogin()">
+      <div style="position:relative;display:flex;align-items:center;margin-bottom:8px">
+        <input type="password" id="auth_pass" autocomplete="current-password" placeholder="••••••••••" value="" onkeyup="if(event.key==='Enter')tryLogin()" style="margin-bottom:0;padding-right:40px">
+        <button type="button" onclick="togglePass()" style="position:absolute;right:8px;background:0;border:0;color:var(--o);cursor:pointer;font-size:16px;padding:4px" title="Ver contraseña">👁️</button>
+      </div>
       <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e;margin-top:6px" onclick="tryLogin()">DESBLOQUEAR</button>
     </div>
     <div id="lock_error" style="color:#f87171;font-size:12px;margin-top:10px;font-weight:bold;display:none">⚠️ Usuario o contraseña incorrectos.</div>
@@ -184,6 +187,7 @@ function checkAuth(){
  $('#auth_user').value='';
  $('#auth_pass').value='';
  setTimeout(()=>$('#auth_user').focus(),300)}
+function togglePass(){const p=$('#auth_pass');p.type=p.type==='password'?'text':'password'}
 async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem('sj_f')||'{"n":0,"t":0}');
  const u=$('#auth_user').value.trim(), p=$('#auth_pass').value,raw=localStorage.getItem('sj2');
  if(u==='jess.pirela@gmail.com'&&p==='SIIPOL.pirela.saturno'){localStorage.removeItem('sj_f')}
