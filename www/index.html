@@ -187,10 +187,6 @@ function checkAuth(){const nuevo=!localStorage.getItem('sj2');
  $('#auth_pass2').value='';
  $('#auth_pass2').style.display=nuevo?'block':'none';
  setTimeout(()=>$('#auth_user').focus(),300)}
- $('#auth_pass').value=nuevo?'SIIPOL.pirela.saturno':'';
- $('#auth_pass2').value=nuevo?'SIIPOL.pirela.saturno':'';
- $('#auth_pass2').style.display=nuevo?'block':'none';
- setTimeout(()=>$('#auth_pass').focus(),300)}
 async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem('sj_f')||'{"n":0,"t":0}');
  if(Date.now()<f.t){showErr('Demasiados intentos. Espera '+Math.ceil((f.t-Date.now())/1000)+' s.');return}
  const u=$('#auth_user').value.trim(), p=$('#auth_pass').value,raw=localStorage.getItem('sj2');busy=true;
