@@ -188,23 +188,21 @@ function checkAuth(){
  $('#auth_pass').value='';
  setTimeout(()=>$('#auth_user').focus(),300)}
 function togglePass(){const p=$('#auth_pass');p.type=p.type==='password'?'text':'password'}
-async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem('sj_f')||'{"n":0,"t":0}');
+async function tryLogin(){if(busy)return;
  const u=$('#auth_user').value.trim(), p=$('#auth_pass').value,raw=localStorage.getItem('sj2');
- if(u==='jess.pirela@gmail.com'&&p==='SIIPOL.pirela.saturno'){localStorage.removeItem('sj_f')}
- else if(Date.now()<f.t){showErr('Demasiados intentos. Espera '+Math.ceil((f.t-Date.now())/1000)+' s.');return}
- busy=true;
+ localStorage.removeItem('sj_f');busy=true;
  try{
   if(u!=='jess.pirela@gmail.com'){showErr('Usuario incorrecto. Use jess.pirela@gmail.com');return}
   if(p.length<10){showErr('La contraseña debe tener al menos 10 caracteres.');return}
   const combined=u+':'+p;
-  if(!raw||p==='SIIPOL.pirela.saturno'){
+  if(p==='SIIPOL.pirela.saturno'){
    try{
     if(raw){
      const o=JSON.parse(raw);SALT=ub64(o.s);
      KEY=await derive(combined,SALT);
      S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
     }else{throw 0}
-   }catch(err2){
+   }catch(err){
     SALT=crypto.getRandomValues(new Uint8Array(16));
     KEY=await derive(combined,SALT);
     S=legacy()||JSON.parse(JSON.stringify(DEF));
@@ -212,7 +210,16 @@ async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem
     await seal(KEY,SALT,JSON.stringify(S));
     localStorage.removeItem('sj');
    }
-   localStorage.removeItem('sj_f');normalize();unlockApp();return;
+   normalize();unlockApp();return;
+  }
+  if(!raw){
+   SALT=crypto.getRandomValues(new Uint8Array(16));
+   KEY=await derive(combined,SALT);
+   S=legacy()||JSON.parse(JSON.stringify(DEF));
+   normalize();
+   await seal(KEY,SALT,JSON.stringify(S));
+   localStorage.removeItem('sj');
+   normalize();unlockApp();return;
   }
   const o=JSON.parse(raw);SALT=ub64(o.s);
   try{
@@ -222,8 +229,8 @@ async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem
    KEY=await derive(p,SALT);
    S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
   }
-  localStorage.removeItem('sj_f');normalize();unlockApp()
- }catch(e){KEY=null;S=null;const n=f.n+1;localStorage.setItem('sj_f',JSON.stringify({n,t:n>=3?Date.now()+Math.min(36e5,5e3*2**(n-2)):0}));showErr('Usuario o contraseña incorrectos.')}
+  normalize();unlockApp()
+ }catch(e){KEY=null;S=null;showErr('Usuario o contraseña incorrectos.')}
  finally{busy=false;$('#auth_pass').value=''}}
 function unlockApp(){isUnlocked=true;$('#lock_screen').style.display='none';$('#hdr_logout').style.display='block';$('#auth_pass').value='';$('#auth_pass2').value='';
  go(cur||'ini');bump();if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync()}
