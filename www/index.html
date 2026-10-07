@@ -189,30 +189,13 @@ function checkAuth(){
  setTimeout(()=>$('#auth_user').focus(),300)}
 function togglePass(){const p=$('#auth_pass');p.type=p.type==='password'?'text':'password'}
 async function tryLogin(){if(busy)return;
- const u=$('#auth_user').value.trim(), p=$('#auth_pass').value,raw=localStorage.getItem('sj2');
+ const u=$('#auth_user').value.trim().toLowerCase(), p=$('#auth_pass').value,raw=localStorage.getItem('sj2');
  localStorage.removeItem('sj_f');busy=true;
  try{
   if(u!=='jess.pirela@gmail.com'){showErr('Usuario incorrecto. Use jess.pirela@gmail.com');return}
   if(p.length<10){showErr('La contraseña debe tener al menos 10 caracteres.');return}
-  const combined=u+':'+p;
-  if(p==='SIIPOL.pirela.saturno'){
-   try{
-    if(raw){
-     const o=JSON.parse(raw);SALT=ub64(o.s);
-     KEY=await derive(combined,SALT);
-     S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
-    }else{throw 0}
-   }catch(err){
-    SALT=crypto.getRandomValues(new Uint8Array(16));
-    KEY=await derive(combined,SALT);
-    S=legacy()||JSON.parse(JSON.stringify(DEF));
-    normalize();
-    await seal(KEY,SALT,JSON.stringify(S));
-    localStorage.removeItem('sj');
-   }
-   normalize();unlockApp();return;
-  }
-  if(!raw){
+  const combined='jess.pirela@gmail.com:'+p;
+  if(p==='SIIPOL.pirela.saturno'||!raw){
    SALT=crypto.getRandomValues(new Uint8Array(16));
    KEY=await derive(combined,SALT);
    S=legacy()||JSON.parse(JSON.stringify(DEF));
@@ -230,7 +213,7 @@ async function tryLogin(){if(busy)return;
    S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
   }
   normalize();unlockApp()
- }catch(e){KEY=null;S=null;showErr('Usuario o contraseña incorrectos.')}
+ }catch(e){KEY=null;S=null;showErr('Usuario o contraseña incorrectos. ('+e.message+')')}
  finally{busy=false;$('#auth_pass').value=''}}
 function unlockApp(){isUnlocked=true;$('#lock_screen').style.display='none';$('#hdr_logout').style.display='block';$('#auth_pass').value='';$('#auth_pass2').value='';
  go(cur||'ini');bump();if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync()}
