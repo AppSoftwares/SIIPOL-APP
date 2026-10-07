@@ -199,13 +199,13 @@ async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem
   const o=JSON.parse(raw);SALT=ub64(o.s);
   try{
    KEY=await derive(combined,SALT);
-   S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64 o.i)},KEY,ub64(o.c))));
+   S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
   }catch(err){
    KEY=await derive(p,SALT);
    S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
   }
   localStorage.removeItem('sj_f');normalize();unlockApp()
- }catch(e){KEY=null;S=null;const n=f.n+1;localStorage.setItem('sj_f',JSON.stringify({n,t:n>=3?Date.now()+Math.min36e5,5e3*2**(n-2)):0}));showErr('Usuario o contraseña incorrectos.')}
+ }catch(e){KEY=null;S=null;const n=f.n+1;localStorage.setItem('sj_f',JSON.stringify({n,t:n>=3?Date.now()+Math.min(36e5,5e3*2**(n-2)):0}));showErr('Usuario o contraseña incorrectos.')}
  finally{busy=false;$('#auth_pass').value=''}}
 function unlockApp(){isUnlocked=true;$('#lock_screen').style.display='none';$('#hdr_logout').style.display='block';$('#auth_pass').value='';$('#auth_pass2').value='';
  go(cur||'ini');bump();if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync()}
