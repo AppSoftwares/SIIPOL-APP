@@ -125,10 +125,10 @@ select[size]{padding:4px;height:auto}
     <p id="lock_msg">Ingresa tu usuario y contraseña institucional para acceder al sistema:</p>
     <div id="lock_inputs">
       <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">USUARIO</small></div>
-      <input type="text" id="auth_user" autocomplete="username" placeholder="jess.pirela@gmail.com" value="jess.pirela@gmail.com">
+      <input type="text" id="auth_user" autocomplete="username" placeholder="jess.pirela@gmail.com" value="">
       <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">CONTRASEÑA</small></div>
-      <input type="password" id="auth_pass" autocomplete="current-password" placeholder="••••••••••" value="SIIPOL.pirela.saturno" onkeyup="if(event.key==='Enter')tryLogin()">
-      <input type="password" id="auth_pass2" autocomplete="new-password" placeholder="Repetir contraseña" style="display:none" onkeyup="if(event.key==='Enter')tryLogin()" value="SIIPOL.pirela.saturno">
+      <input type="password" id="auth_pass" autocomplete="current-password" placeholder="••••••••••" value="" onkeyup="if(event.key==='Enter')tryLogin()">
+      <input type="password" id="auth_pass2" autocomplete="new-password" placeholder="Repetir contraseña" style="display:none" onkeyup="if(event.key==='Enter')tryLogin()" value="">
       <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e;margin-top:6px" onclick="tryLogin()">DESBLOQUEAR</button>
     </div>
     <div id="lock_error" style="color:#f87171;font-size:12px;margin-top:10px;font-weight:bold;display:none">⚠️ Usuario o contraseña incorrectos.</div>
@@ -181,8 +181,12 @@ function normalize(){if(!Array.isArray(S.p))S.p=[];S.cfg=S.cfg||{};S.cfg.rec={..
 const showErr=m=>{const e=$('#lock_error');e.textContent='⚠️ '+m;e.style.display='block'};
 function checkAuth(){const nuevo=!localStorage.getItem('sj2');
  $('#lock_screen').style.display='flex';$('#hdr_logout').style.display='none';$('#lock_error').style.display='none';
- $('#lock_msg').textContent=nuevo?'Primer uso: verifica tu usuario y contraseña. Cifrará todos los datos.':'Ingresa tu usuario y contraseña para acceder:';
- $('#auth_user').value='jess.pirela@gmail.com';
+ $('#lock_msg').textContent=nuevo?'Primer uso: ingresa tu usuario y contraseña (mínimo 10 caracteres). Cifrará todos los datos.':'Ingresa tu usuario y contraseña para acceder:';
+ $('#auth_user').value='';
+ $('#auth_pass').value='';
+ $('#auth_pass2').value='';
+ $('#auth_pass2').style.display=nuevo?'block':'none';
+ setTimeout(()=>$('#auth_user').focus(),300)}
  $('#auth_pass').value=nuevo?'SIIPOL.pirela.saturno':'';
  $('#auth_pass2').value=nuevo?'SIIPOL.pirela.saturno':'';
  $('#auth_pass2').style.display=nuevo?'block':'none';
