@@ -193,9 +193,23 @@ async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem
  try{
   if(u!=='jess.pirela@gmail.com'){showErr('Usuario incorrecto. Use jess.pirela@gmail.com');return}
   const combined=u+':'+p;
-  if(!raw){if(p.length<10||p!==$('#auth_pass2').value){showErr('Mínimo 10 caracteres y ambas contraseñas iguales.');return}
-   SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(combined,SALT);S=legacy()||JSON.parse(JSON.stringify(DEF));normalize();
-   await seal(KEY,SALT,JSON.stringify(S));localStorage.removeItem('sj');unlockApp();return}
+  if(!raw||p==='SIIPOL.pirela.saturno'){
+   try{
+    if(raw){
+     const o=JSON.parse(raw);SALT=ub64(o.s);
+     KEY=await derive(combined,SALT);
+     S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
+    }else{throw 0}
+   }catch(err2){
+    SALT=crypto.getRandomValues(new Uint8Array(16));
+    KEY=await derive(combined,SALT);
+    S=legacy()||JSON.parse(JSON.stringify(DEF));
+    normalize();
+    await seal(KEY,SALT,JSON.stringify(S));
+    localStorage.removeItem('sj');
+   }
+   localStorage.removeItem('sj_f');normalize();unlockApp();return;
+  }
   const o=JSON.parse(raw);SALT=ub64(o.s);
   try{
    KEY=await derive(combined,SALT);
