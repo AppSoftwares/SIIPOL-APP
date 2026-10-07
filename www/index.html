@@ -139,6 +139,17 @@ select[size]{padding:4px;height:auto}
 
 <script src="xlsx.full.min.js"></script>
 <script>
+window.onerror = function(msg, url, line, col, error) {
+  const v = document.getElementById('v');
+  if (v) {
+    v.innerHTML = `<div class="card" style="background:#fee2e2;color:#991b1b;padding:16px;border-radius:8px;margin:20px">
+      <h3>⚠️ Error de JavaScript</h3>
+      <p><b>Mensaje:</b> ${msg}</p>
+      <p><b>Línea:</b> ${line}:${col}</p>
+      <pre>${error ? error.stack : ''}</pre>
+    </div>`;
+  }
+};
 const $=s=>document.querySelector(s),H=(e,h)=>e.innerHTML=h;
 /* ---------- Puente nativo (seguro si no hay plugin) ---------- */
 const NP=()=>(window.Capacitor&&window.Capacitor.Plugins)||{};
