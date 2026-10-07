@@ -124,9 +124,11 @@ select[size]{padding:4px;height:auto}
     <h2>Acceso Restringido</h2>
     <p id="lock_msg">Ingresa tu usuario y contraseña institucional para acceder al sistema:</p>
     <div id="lock_inputs">
+      <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">USUARIO</small></div>
+      <input type="text" id="auth_user" autocomplete="username" placeholder="jess.pirela@gmail.com" value="jess.pirela@gmail.com">
       <div style="text-align:left;margin-bottom:2px"><small style="color:var(--o);font-weight:bold;font-size:11px">CONTRASEÑA</small></div>
-      <input type="password" id="auth_pass" autocomplete="current-password" placeholder="••••••••••" onkeyup="if(event.key==='Enter')tryLogin()">
-      <input type="password" id="auth_pass2" autocomplete="new-password" placeholder="Repetir contraseña" style="display:none" onkeyup="if(event.key==='Enter')tryLogin()">
+      <input type="password" id="auth_pass" autocomplete="current-password" placeholder="••••••••••" value="SIIPOL.pirela.saturno" onkeyup="if(event.key==='Enter')tryLogin()">
+      <input type="password" id="auth_pass2" autocomplete="new-password" placeholder="Repetir contraseña" style="display:none" onkeyup="if(event.key==='Enter')tryLogin()" value="SIIPOL.pirela.saturno">
       <button class="b" style="width:100%;padding:12px;font-weight:bold;font-size:15px;background:var(--o);color:#231a1e;margin-top:6px" onclick="tryLogin()">DESBLOQUEAR</button>
     </div>
     <div id="lock_error" style="color:#f87171;font-size:12px;margin-top:10px;font-weight:bold;display:none">⚠️ Usuario o contraseña incorrectos.</div>
@@ -179,20 +181,31 @@ function normalize(){if(!Array.isArray(S.p))S.p=[];S.cfg=S.cfg||{};S.cfg.rec={..
 const showErr=m=>{const e=$('#lock_error');e.textContent='⚠️ '+m;e.style.display='block'};
 function checkAuth(){const nuevo=!localStorage.getItem('sj2');
  $('#lock_screen').style.display='flex';$('#hdr_logout').style.display='none';$('#lock_error').style.display='none';
- $('#lock_msg').textContent=nuevo?'Primer uso: crea una contraseña (mínimo 10 caracteres). Cifrará todos los datos del equipo. Si la olvidas no se puede recuperar.':'Ingresa tu contraseña para acceder al sistema:';
- $('#auth_pass2').style.display=nuevo?'block':'none';$('#auth_pass').value='';$('#auth_pass2').value='';
+ $('#lock_msg').textContent=nuevo?'Primer uso: verifica tu usuario y contraseña. Cifrará todos los datos.':'Ingresa tu usuario y contraseña para acceder:';
+ $('#auth_user').value='jess.pirela@gmail.com';
+ $('#auth_pass').value=nuevo?'SIIPOL.pirela.saturno':'';
+ $('#auth_pass2').value=nuevo?'SIIPOL.pirela.saturno':'';
+ $('#auth_pass2').style.display=nuevo?'block':'none';
  setTimeout(()=>$('#auth_pass').focus(),300)}
 async function tryLogin(){if(busy)return;const f=JSON.parse(localStorage.getItem('sj_f')||'{"n":0,"t":0}');
  if(Date.now()<f.t){showErr('Demasiados intentos. Espera '+Math.ceil((f.t-Date.now())/1000)+' s.');return}
- const p=$('#auth_pass').value,raw=localStorage.getItem('sj2');busy=true;
+ const u=$('#auth_user').value.trim(), p=$('#auth_pass').value,raw=localStorage.getItem('sj2');busy=true;
  try{
+  if(u!=='jess.pirela@gmail.com'){showErr('Usuario incorrecto. Use jess.pirela@gmail.com');return}
+  const combined=u+':'+p;
   if(!raw){if(p.length<10||p!==$('#auth_pass2').value){showErr('Mínimo 10 caracteres y ambas contraseñas iguales.');return}
-   SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(p,SALT);S=legacy()||JSON.parse(JSON.stringify(DEF));normalize();
+   SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(combined,SALT);S=legacy()||JSON.parse(JSON.stringify(DEF));normalize();
    await seal(KEY,SALT,JSON.stringify(S));localStorage.removeItem('sj');unlockApp();return}
-  const o=JSON.parse(raw);SALT=ub64(o.s);KEY=await derive(p,SALT);
-  S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
+  const o=JSON.parse(raw);SALT=ub64(o.s);
+  try{
+   KEY=await derive(combined,SALT);
+   S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64 o.i)},KEY,ub64(o.c))));
+  }catch(err){
+   KEY=await derive(p,SALT);
+   S=JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.i)},KEY,ub64(o.c))));
+  }
   localStorage.removeItem('sj_f');normalize();unlockApp()
- }catch(e){KEY=null;S=null;const n=f.n+1;localStorage.setItem('sj_f',JSON.stringify({n,t:n>=3?Date.now()+Math.min(36e5,5e3*2**(n-2)):0}));showErr('Contraseña incorrecta.')}
+ }catch(e){KEY=null;S=null;const n=f.n+1;localStorage.setItem('sj_f',JSON.stringify({n,t:n>=3?Date.now()+Math.min36e5,5e3*2**(n-2)):0}));showErr('Usuario o contraseña incorrectos.')}
  finally{busy=false;$('#auth_pass').value=''}}
 function unlockApp(){isUnlocked=true;$('#lock_screen').style.display='none';$('#hdr_logout').style.display='block';$('#auth_pass').value='';$('#auth_pass2').value='';
  go(cur||'ini');bump();if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync()}
