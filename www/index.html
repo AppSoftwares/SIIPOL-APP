@@ -236,7 +236,9 @@ async function tryLogin(){if(busy)return;
   normalize();unlockApp()
  }catch(e){KEY=null;S=null;showErr('Usuario o contraseña incorrectos. ('+e.message+')')}
  finally{busy=false;$('#auth_pass').value=''}}
-function unlockApp(){isUnlocked=true;$('#lock_screen').style.display='none';$('#hdr_logout').style.display='block';$('#auth_pass').value='';$('#auth_pass2').value='';
+function unlockApp(){isUnlocked=true;$('#lock_screen').style.display='none';$('#hdr_logout').style.display='block';$('#auth_pass').value='';
+ if(!S) S=JSON.parse(JSON.stringify(DEF));
+ normalize();
  go(cur||'ini');bump();if(navigator.onLine&&S.cfg.url&&Date.now()-S.cfg.last>7*864e5)sync()}
 function lock(){KEY=null;S=null;window.O=null;isUnlocked=false;clearTimeout(idleT);['#v','#nav','#mb','#pr'].forEach(s=>H($(s),''));$('#md').classList.remove('on');checkAuth()}
 const doLogout=lock;
